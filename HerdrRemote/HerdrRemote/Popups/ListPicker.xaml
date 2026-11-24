@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="Popups.ListPicker">
+    <!-- The choice sheet: the title with Cancel at its right, the options in a list card (a check on the current one). The body of a bottom sheet (PopupsHandle.PopBottomSheetAsync). -->
+    <Grid RowDefinitions="Auto,Auto">
+        <Grid Grid.Row="0" Style="{StaticResource Sht.Head}">
+            <Label x:Name="Lbl_Title" Style="{StaticResource Sht.Title}"/>
+            <Button x:Name="Btn_Cancel" Grid.Column="1" Style="{StaticResource Sht.Action}" Clicked="Cancel_Clicked"/>
+        </Grid>
+        <Border Grid.Row="1" Style="{StaticResource Lst}">
+        <!-- A pick is the whole row: SelectionChanged returns the Text of the picked Option. -->
+        <CollectionView x:Name="ListPickerItems" Style="{StaticResource Lst.Options}" ItemTemplate="{StaticResource Lst.OptionTemplate}" SelectionMode="Single" SelectionChanged="Item_SelectionChanged"/>
+        </Border>
+    </Grid>
+</ContentView>

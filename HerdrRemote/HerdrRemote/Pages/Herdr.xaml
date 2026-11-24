@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:lang="clr-namespace:Languages" xmlns:pages="clr-namespace:HerdrRemote.Pages" x:Class="HerdrRemote.Pages.Herdr" Title="Herdr" Style="{StaticResource Page}">
+    <!-- Herdr page: the header opens Connection; the connection card hides when connected.
+         AgentList follows herdr-app's sidebar, with Spaces and Agents scrolling together on the phone.
+         SetLanguage, ShowConnection, and AgentList.Show supply labels and rows. -->
+    <Grid RowDefinitions="Auto,*,Auto">
+        <pages:Header x:Name="Header" Grid.Row="0" ActionTapped="Header_ActionTapped"/>
+        <ScrollView x:Name="Scroll" Grid.Row="1">
+            <!-- The card, then the list's two parts (added by the constructor). -->
+            <VerticalStackLayout x:Name="Body">
+                <pages:ConnectionCard x:Name="Card" Margin="{StaticResource Gutter}" ActionTapped="Card_ActionTapped"/>
+            </VerticalStackLayout>
+        </ScrollView>
+        <pages:TabsFooter x:Name="Tabs" Grid.Row="2"/>
+        <pages:IsBusyBox x:Name="IsBusyBox" Grid.Row="0" Grid.RowSpan="3" IsVisible="False" BoxTitle="{lang:i18n Key='Loading'}" BoxBody="{lang:i18n Key='Please wait.'}"/>
+    </Grid>
+</ContentPage>

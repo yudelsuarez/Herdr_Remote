@@ -1,0 +1,1687 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Light and dark resources share a key with a Dark suffix for the dark variant.
+     AppThemeBinding and code both look up resources by these keys. -->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:app="clr-namespace:HerdrRemote"
+    xmlns:pages="clr-namespace:HerdrRemote.Pages"
+    xmlns:popups="clr-namespace:Popups">
+
+    <!-- ── Color tokens (round alpha × 255 for the alpha byte) ── -->
+    <Color x:Key="Bg">#F7F7F4</Color>
+    <Color x:Key="BgDark">#0C1017</Color>
+    <Color x:Key="CardFill">#FFFFFF</Color>
+    <Color x:Key="CardFillDark">#151C27</Color>
+    <Color x:Key="Sel">#0F000000</Color>
+    <Color x:Key="SelDark">#12FFFFFF</Color>
+    <Color x:Key="Line">#17000000</Color>
+    <Color x:Key="LineDark">#17FFFFFF</Color>
+    <Color x:Key="Line2">#26000000</Color>
+    <Color x:Key="Line2Dark">#29FFFFFF</Color>
+    <Color x:Key="Ink">#1B1B1E</Color>
+    <Color x:Key="InkDark">#EEEEEF</Color>
+    <Color x:Key="Ink2">#565B66</Color>
+    <Color x:Key="Ink2Dark">#A5AFBF</Color>
+    <Color x:Key="Ink3">#7B7E87</Color>
+    <Color x:Key="Ink3Dark">#76839A</Color>
+    <Color x:Key="Acc">#1F62D0</Color>
+    <Color x:Key="AccDark">#91B6EE</Color>
+    <Color x:Key="ReaderPending">#2B1F62D0</Color>
+    <Color x:Key="ReaderPendingDark">#2B91B6EE</Color>
+    <Color x:Key="ReaderSpeaking">#4D1F62D0</Color>
+    <Color x:Key="ReaderSpeakingDark">#4D91B6EE</Color>
+    <Color x:Key="OnAcc">#FFFFFF</Color>
+    <Color x:Key="OnAccDark">#0C1017</Color>
+    <Color x:Key="Ok">#1A7F37</Color>
+    <Color x:Key="OkDark">#89C5AA</Color>
+    <Color x:Key="Work">#9A6700</Color>
+    <Color x:Key="WorkDark">#E5C07B</Color>
+    <Color x:Key="Need">#C93C2C</Color>
+    <Color x:Key="NeedDark">#F0705F</Color>
+    <Color x:Key="Done">#2F6FE4</Color>
+    <Color x:Key="DoneDark">#76A8FF</Color>
+    <Color x:Key="Idle">#8A8F99</Color>
+    <Color x:Key="IdleDark">#7F91A7</Color>
+    <Color x:Key="ConInk">#25272C</Color>
+    <Color x:Key="ConInkDark">#CDD6E4</Color>
+    <!-- The opaque tray colors match 88% light and 90% dark fills over the page background.
+         Nothing sits behind the tray, so it does not need blur. -->
+    <Color x:Key="TrayFill">#FEFEFE</Color>
+    <Color x:Key="TrayFillDark">#141B25</Color>
+    <Color x:Key="TrayLine">#1A000000</Color>
+    <Color x:Key="TrayLineDark">#1FFFFFFF</Color>
+    <Color x:Key="KeyFill">#0F141820</Color>
+    <Color x:Key="KeyFillDark">#12FFFFFF</Color>
+    <Color x:Key="KeyOnFill">#24141820</Color>
+    <Color x:Key="KeyOnFillDark">#29FFFFFF</Color>
+    <Color x:Key="SegFill">#0F141820</Color>
+    <Color x:Key="SegFillDark">#0FFFFFFF</Color>
+    <Color x:Key="SegOnFill">#FFFFFF</Color>
+    <Color x:Key="SegOnFillDark">#232D3C</Color>
+    <Color x:Key="FieldFill">#FFFFFF</Color>
+    <Color x:Key="FieldFillDark">#111720</Color>
+    <Color x:Key="ImgLine">#1F000000</Color>
+    <Color x:Key="ImgLineDark">#1AFFFFFF</Color>
+    <!-- The connection card uses the status color at 8% opacity for the fill and 35% for the border. -->
+    <Color x:Key="OkSoft">#141A7F37</Color>
+    <Color x:Key="OkSoftDark">#1489C5AA</Color>
+    <Color x:Key="WorkSoft">#149A6700</Color>
+    <Color x:Key="WorkSoftDark">#14E5C07B</Color>
+    <Color x:Key="NeedSoft">#14C93C2C</Color>
+    <Color x:Key="NeedSoftDark">#14F0705F</Color>
+    <Color x:Key="AccSoft">#141F62D0</Color>
+    <Color x:Key="AccSoftDark">#1491B6EE</Color>
+    <Color x:Key="OkEdge">#591A7F37</Color>
+    <Color x:Key="OkEdgeDark">#5989C5AA</Color>
+    <Color x:Key="WorkEdge">#599A6700</Color>
+    <Color x:Key="WorkEdgeDark">#59E5C07B</Color>
+    <Color x:Key="NeedEdge">#59C93C2C</Color>
+    <Color x:Key="NeedEdgeDark">#59F0705F</Color>
+    <Color x:Key="AccEdge">#591F62D0</Color>
+    <Color x:Key="AccEdgeDark">#5991B6EE</Color>
+    <Color x:Key="NeedChip">#29C93C2C</Color>
+    <Color x:Key="NeedChipDark">#29F0705F</Color>
+    <!-- The terminal ANSI palette reuses Ok for green and Acc for blue. -->
+    <Color x:Key="AnsiBlack">#25272C</Color>
+    <Color x:Key="AnsiBlackDark">#232D3C</Color>
+    <Color x:Key="AnsiRed">#C62A2A</Color>
+    <Color x:Key="AnsiRedDark">#E58C9A</Color>
+    <Color x:Key="AnsiYellow">#8F5D00</Color>
+    <Color x:Key="AnsiYellowDark">#D9BE82</Color>
+    <Color x:Key="AnsiMagenta">#7A45C8</Color>
+    <Color x:Key="AnsiMagentaDark">#B9A0E2</Color>
+    <Color x:Key="AnsiCyan">#0F6F74</Color>
+    <Color x:Key="AnsiCyanDark">#85C4D0</Color>
+    <Color x:Key="AnsiWhite">#8A8F99</Color>
+    <Color x:Key="AnsiWhiteDark">#CDD6E4</Color>
+    <Color x:Key="AnsiDim">#7B7E87</Color>
+    <Color x:Key="AnsiDimDark">#7F91A7</Color>
+    <!-- The scrim and reconnect strip use the same colors in both themes. -->
+    <Color x:Key="Overlay">#8C040810</Color>
+    <Color x:Key="Amber">#E7B64B</Color>
+    <Color x:Key="AmberInk">#2B1D04</Color>
+
+    <!-- ── Shared sizes ── -->
+    <!-- Keep corner radii as integers. Button silently ignores a double and leaves its radius at -1;
+         RoundRectangle also accepts integers. -->
+    <x:Int32 x:Key="R0">6</x:Int32>
+    <x:Int32 x:Key="R1">8</x:Int32>
+    <x:Int32 x:Key="R2">12</x:Int32>
+    <x:Int32 x:Key="R3">16</x:Int32>
+    <Thickness x:Key="Gutter">16,0</Thickness>
+    <x:Double x:Key="TrayGap">12</x:Double>
+
+    <Shadow x:Key="Shadow.Tray" Brush="{AppThemeBinding Light=#141820, Dark=#000000}" Opacity="{AppThemeBinding Light=0.16, Dark=0.45}" Radius="30" Offset="0,10"/>
+    <Shadow x:Key="Shadow.Sheet" Brush="#000000" Opacity="0.40" Radius="40" Offset="0,-10"/>
+    <!-- Only the light theme uses a dialog shadow; the dark theme skips the blur. -->
+    <Shadow x:Key="Shadow.Dlg" Brush="#0F172A" Opacity="0.12" Radius="24" Offset="0,8"/>
+
+    <!-- ── Page ── -->
+    <Style x:Key="Page" TargetType="ContentPage">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Bg}, Dark={StaticResource BgDark}}"/>
+        <Setter Property="SafeAreaEdges" Value="All"/>
+    </Style>
+
+    <!-- ── Icon glyphs (Label) ── -->
+    <!-- Code colors the card icon by status. The other icon styles inherit these setters. -->
+    <Style x:Key="Card.Glyph" TargetType="Label">
+        <Setter Property="FontFamily" Value="icons"/>
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Lst.Glyph" TargetType="Label" BasedOn="{StaticResource Card.Glyph}">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}"/>
+    </Style>
+    <Style x:Key="Fld.Eye" TargetType="Label" BasedOn="{StaticResource Lst.Glyph}"/>
+    <Style x:Key="Lst.Check" TargetType="Label" BasedOn="{StaticResource Card.Glyph}">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+    </Style>
+    <Style x:Key="Hdr.Icon" TargetType="Label" BasedOn="{StaticResource Lst.Glyph}">
+        <Setter Property="FontSize" Value="22"/>
+    </Style>
+    <Style x:Key="Tile.MacIcon" TargetType="Label" BasedOn="{StaticResource Lst.Glyph}">
+        <Setter Property="FontSize" Value="16"/>
+    </Style>
+    <Style x:Key="Seg.Icon" TargetType="Label" BasedOn="{StaticResource Lst.Glyph}">
+        <Setter Property="FontSize" Value="17"/>
+    </Style>
+    <Style x:Key="Seg.IconOn" TargetType="Label" BasedOn="{StaticResource Seg.Icon}">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+    </Style>
+    <Style x:Key="Row.Chev" TargetType="Label" BasedOn="{StaticResource Card.Glyph}">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+    </Style>
+    <Style x:Key="Lst.Chev" TargetType="Label" BasedOn="{StaticResource Row.Chev}"/>
+    <Style x:Key="Pill.Chev" TargetType="Label" BasedOn="{StaticResource Row.Chev}">
+        <Setter Property="FontSize" Value="14"/>
+    </Style>
+    <Style x:Key="Tab.Icon" TargetType="Label" BasedOn="{StaticResource Row.Chev}">
+        <Setter Property="AutomationProperties.IsInAccessibleTree" Value="False"/>
+        <Setter Property="FontSize" Value="22"/>
+    </Style>
+    <Style x:Key="Tab.IconOn" TargetType="Label" BasedOn="{StaticResource Tab.Icon}">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+    </Style>
+    <Style x:Key="LinkStrip.Glyph" TargetType="Label" BasedOn="{StaticResource Card.Glyph}">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="TextColor" Value="{StaticResource AmberInk}"/>
+    </Style>
+
+    <!-- ── Subtitles use Geist; monospace is reserved for code and addresses ── -->
+    <Style x:Key="Lst.Sub" TargetType="Label">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+    </Style>
+    <Style x:Key="Agent.L2" TargetType="Label" BasedOn="{StaticResource Lst.Sub}">
+        <Setter Property="Margin" Value="0,3,0,0"/>
+    </Style>
+    <Style x:Key="Agent.AddressSpan" TargetType="Span">
+        <Setter Property="FontFamily" Value="GeistMono"/>
+    </Style>
+    <Style x:Key="Row.PaneIndex" TargetType="Label" BasedOn="{StaticResource Lst.Sub}">
+        <Setter Property="FontFamily" Value="GeistMono"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Row.PaneAddr" TargetType="Label" BasedOn="{StaticResource Row.PaneIndex}"/>
+    <Style x:Key="Search.Line" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistMono"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}"/>
+        <Setter Property="MaxLines" Value="1"/>
+        <Setter Property="LineBreakMode" Value="TailTruncation"/>
+    </Style>
+    <Style x:Key="Grp.Count" TargetType="Label" BasedOn="{StaticResource Lst.Sub}">
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Reader.Phase" TargetType="Label" BasedOn="{StaticResource Grp.Count}">
+        <Setter Property="HorizontalTextAlignment" Value="End"/>
+    </Style>
+
+    <!-- The header stays 48 points high in either orientation, with text on the left and controls on the right.
+         The subtitle gets its own row only when a custom leading view is present. -->
+    <Style x:Key="Hdr" TargetType="Grid">
+        <Setter Property="RowDefinitions" Value="48,Auto"/>
+        <Setter Property="Padding" Value="16,0,12,0"/>
+        <Setter Property="ColumnDefinitions" Value="*,Auto,Auto"/>
+        <Setter Property="ColumnSpacing" Value="0"/>
+    </Style>
+    <Style x:Key="Hdr.Title" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistSemiBold"/>
+        <Setter Property="FontSize" Value="17"/>
+        <Setter Property="CharacterSpacing" Value="-0.17"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+        <Setter Property="MaxLines" Value="1"/>
+        <Setter Property="LineBreakMode" Value="TailTruncation"/>
+    </Style>
+    <Style x:Key="Hdr.SubLine" TargetType="HorizontalStackLayout">
+        <Setter Property="Spacing" Value="0"/>
+        <Setter Property="Margin" Value="0,3,0,0"/>
+    </Style>
+    <Style x:Key="Hdr.Sub" TargetType="Label" BasedOn="{StaticResource Lst.Sub}">
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="MaxLines" Value="1"/>
+        <Setter Property="LineBreakMode" Value="TailTruncation"/>
+    </Style>
+    <!-- The subtitle truncates the detail, not the status. Code sets the status color. -->
+    <Style x:Key="Hdr.SubStatus" TargetType="Label" BasedOn="{StaticResource Hdr.Sub}">
+        <Setter Property="LineBreakMode" Value="NoWrap"/>
+    </Style>
+    <Style x:Key="Hdr.SubRow" TargetType="HorizontalStackLayout" BasedOn="{StaticResource Hdr.SubLine}">
+        <Setter Property="Margin" Value="0,0,0,6"/>
+    </Style>
+    <Style x:Key="Hdr.Button" TargetType="Grid">
+        <Setter Property="WidthRequest" Value="40"/>
+        <Setter Property="HeightRequest" Value="40"/>
+    </Style>
+    <!-- The connection dot sits 8 points from the top and 7 from the right, with a background-colored ring.
+         Code sets the fill. -->
+    <Style x:Key="Hdr.Dot" TargetType="Ellipse">
+        <Setter Property="WidthRequest" Value="8"/>
+        <Setter Property="HeightRequest" Value="8"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Bg}, Dark={StaticResource BgDark}}"/>
+        <Setter Property="StrokeThickness" Value="2"/>
+        <Setter Property="HorizontalOptions" Value="End"/>
+        <Setter Property="VerticalOptions" Value="Start"/>
+        <Setter Property="Margin" Value="0,8,7,0"/>
+    </Style>
+
+    <!-- ── List screen ── -->
+    <Style x:Key="Sec" TargetType="Grid">
+        <Setter Property="MinimumHeightRequest" Value="36"/>
+        <Setter Property="Padding" Value="{StaticResource Gutter}"/>
+        <Setter Property="ColumnDefinitions" Value="*,Auto"/>
+    </Style>
+    <Style x:Key="Sec.Title" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistMedium"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <!-- The Agents section starts with a divider after 4 points of space, then a 40-point heading. -->
+    <Style x:Key="Sec.Divided" TargetType="Grid">
+        <Setter Property="RowDefinitions" Value="Auto,40"/>
+        <Setter Property="Margin" Value="0,4,0,0"/>
+    </Style>
+    <!-- Use this spacer when a card has no section heading. -->
+    <Style x:Key="Sec.Spacer" TargetType="Grid">
+        <Setter Property="HeightRequest" Value="30"/>
+    </Style>
+    <Style x:Key="Sec.Button" TargetType="Grid">
+        <Setter Property="WidthRequest" Value="32"/>
+        <Setter Property="HeightRequest" Value="32"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <!-- The sort buttons use Lucide clock paths on a 24-unit grid. -->
+    <Style x:Key="Sec.Path" TargetType="Path">
+        <Setter Property="WidthRequest" Value="18"/>
+        <Setter Property="HeightRequest" Value="18"/>
+        <Setter Property="Aspect" Value="Uniform"/>
+        <Setter Property="StrokeThickness" Value="1.5"/>
+        <Setter Property="StrokeLineCap" Value="Round"/>
+        <Setter Property="StrokeLineJoin" Value="Round"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Row.Space" TargetType="Grid">
+        <Setter Property="MinimumHeightRequest" Value="44"/>
+        <Setter Property="Padding" Value="{StaticResource Gutter}"/>
+        <Setter Property="ColumnDefinitions" Value="Auto,*,Auto"/>
+        <Setter Property="ColumnSpacing" Value="12"/>
+    </Style>
+    <Style x:Key="Row.SpaceCompact" TargetType="Grid" BasedOn="{StaticResource Row.Space}">
+        <Setter Property="MinimumHeightRequest" Value="40"/>
+    </Style>
+    <!-- Code sets the tile fill to the space’s color. -->
+    <Style x:Key="Tile" TargetType="Border">
+        <Setter Property="WidthRequest" Value="26"/>
+        <Setter Property="HeightRequest" Value="26"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R1}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Tile.Initial" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistSemiBold"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="TextColor" Value="White"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <!-- The Mac group uses an outlined tile with its connection dot in the corner. -->
+    <Style x:Key="Tile.Mac" TargetType="Border" BasedOn="{StaticResource Tile}">
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Line2}, Dark={StaticResource Line2Dark}}"/>
+        <Setter Property="StrokeThickness" Value="1"/>
+    </Style>
+    <Style x:Key="Tile.MacDot" TargetType="Ellipse">
+        <Setter Property="WidthRequest" Value="7"/>
+        <Setter Property="HeightRequest" Value="7"/>
+        <Setter Property="Fill" Value="{AppThemeBinding Light={StaticResource Ok}, Dark={StaticResource OkDark}}"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Bg}, Dark={StaticResource BgDark}}"/>
+        <Setter Property="StrokeThickness" Value="1.5"/>
+        <Setter Property="HorizontalOptions" Value="End"/>
+        <Setter Property="VerticalOptions" Value="End"/>
+        <Setter Property="Margin" Value="0,0,-3,-3"/>
+    </Style>
+    <Style x:Key="Row.Name" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistMedium"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Row.Pane" TargetType="Grid">
+        <Setter Property="MinimumHeightRequest" Value="32"/>
+        <Setter Property="Padding" Value="54,0,16,0"/>
+        <Setter Property="ColumnDefinitions" Value="Auto,*,Auto"/>
+        <Setter Property="ColumnSpacing" Value="10"/>
+    </Style>
+    <!-- Tab rows show a number, icon, name, and address or map.
+         The icon column matches the agent icon width and centers narrower terminal icons so names line up. -->
+    <Style x:Key="Row.Tab" TargetType="Grid" BasedOn="{StaticResource Row.Pane}">
+        <Setter Property="ColumnDefinitions" Value="Auto,24,*,Auto"/>
+    </Style>
+    <Style x:Key="Row.PaneName" TargetType="Label">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Row.TabName" TargetType="Label" BasedOn="{StaticResource Row.PaneName}">
+        <Setter Property="MaxLines" Value="1"/>
+        <Setter Property="LineBreakMode" Value="TailTruncation"/>
+    </Style>
+    <Style x:Key="Grp" TargetType="HorizontalStackLayout">
+        <Setter Property="MinimumHeightRequest" Value="30"/>
+        <Setter Property="Padding" Value="{StaticResource Gutter}"/>
+        <Setter Property="Spacing" Value="8"/>
+    </Style>
+    <!-- Idle, Pinned, and space headings use the default muted color. Code colors Need, Work, and Done. -->
+    <Style x:Key="Grp.Title" TargetType="Label" BasedOn="{StaticResource Sec.Title}">
+        <Setter Property="FontSize" Value="12.5"/>
+    </Style>
+    <!-- The transparent button covers the whole row so taps and holds work anywhere on it. -->
+    <Style x:Key="Hold" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="BorderWidth" Value="0"/>
+        <Setter Property="CornerRadius" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="MinimumHeightRequest" Value="0"/>
+        <Setter Property="MinimumWidthRequest" Value="0"/>
+    </Style>
+    <Style x:Key="Row.Agent" TargetType="Grid">
+        <Setter Property="MinimumHeightRequest" Value="52"/>
+        <Setter Property="Padding" Value="{StaticResource Gutter}"/>
+        <Setter Property="ColumnDefinitions" Value="32,*,Auto"/>
+        <Setter Property="ColumnSpacing" Value="12"/>
+    </Style>
+    <Style x:Key="Row.AgentCompact" TargetType="Grid" BasedOn="{StaticResource Row.Agent}">
+        <Setter Property="MinimumHeightRequest" Value="46"/>
+    </Style>
+    <Style x:Key="Agent.L1" TargetType="Label" BasedOn="{StaticResource Row.Name}">
+        <Setter Property="MaxLines" Value="1"/>
+        <Setter Property="LineBreakMode" Value="TailTruncation"/>
+    </Style>
+    <Style x:Key="Agent.SepSpan" TargetType="Span">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+    </Style>
+    <Style x:Key="Agent.TitleSpan" TargetType="Span">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}"/>
+    </Style>
+    <!-- Code gives the agent icon tile its brand color when one is available. -->
+    <Style x:Key="Mark" TargetType="Border">
+        <Setter Property="WidthRequest" Value="32"/>
+        <Setter Property="HeightRequest" Value="32"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R1}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Mark.Small" TargetType="Border" BasedOn="{StaticResource Mark}">
+        <Setter Property="WidthRequest" Value="24"/>
+        <Setter Property="HeightRequest" Value="24"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R0}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!-- The agent icon is smaller on a brand tile. Screen readers skip the icon. -->
+    <Style x:Key="Mark.Bare" TargetType="Label" BasedOn="{StaticResource Card.Glyph}">
+        <Setter Property="AutomationProperties.IsInAccessibleTree" Value="False"/>
+        <Setter Property="FontSize" Value="26"/>
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+        <Setter Property="VerticalTextAlignment" Value="Center"/>
+    </Style>
+    <Style x:Key="Mark.BareSmall" TargetType="Label" BasedOn="{StaticResource Mark.Bare}">
+        <Setter Property="FontSize" Value="20"/>
+    </Style>
+    <Style x:Key="Mark.OnTile" TargetType="Label" BasedOn="{StaticResource Mark.BareSmall}"/>
+    <Style x:Key="Mark.OnTileSmall" TargetType="Label" BasedOn="{StaticResource Mark.Bare}">
+        <Setter Property="FontSize" Value="15"/>
+    </Style>
+    <Style x:Key="Chip.Need" TargetType="Border">
+        <Setter Property="HeightRequest" Value="20"/>
+        <Setter Property="Padding" Value="7,0"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource NeedChip}, Dark={StaticResource NeedChipDark}}"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R0}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Chip.NeedText" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistSemiBold"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Need}, Dark={StaticResource NeedDark}}"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Agent.Spin" TargetType="Grid">
+        <Setter Property="WidthRequest" Value="14"/>
+        <Setter Property="HeightRequest" Value="14"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <!-- The working spinner mirrors herdr-app: a faint ring with a rotating quarter arc of radius 6. -->
+    <Style x:Key="Agent.SpinTrack" TargetType="Ellipse">
+        <Setter Property="WidthRequest" Value="14"/>
+        <Setter Property="HeightRequest" Value="14"/>
+        <Setter Property="StrokeThickness" Value="2"/>
+        <Setter Property="Opacity" Value="0.24"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Work}, Dark={StaticResource WorkDark}}"/>
+    </Style>
+    <Style x:Key="Agent.SpinArc" TargetType="Path">
+        <Setter Property="WidthRequest" Value="16"/>
+        <Setter Property="HeightRequest" Value="16"/>
+        <Setter Property="StrokeThickness" Value="2"/>
+        <Setter Property="StrokeLineCap" Value="Round"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Work}, Dark={StaticResource WorkDark}}"/>
+    </Style>
+    <Style x:Key="Agent.Dot" TargetType="Ellipse">
+        <Setter Property="WidthRequest" Value="8"/>
+        <Setter Property="HeightRequest" Value="8"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Agent.Ring" TargetType="Ellipse" BasedOn="{StaticResource Agent.Dot}">
+        <Setter Property="StrokeThickness" Value="1.5"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Idle}, Dark={StaticResource IdleDark}}"/>
+    </Style>
+    <Style x:Key="Row.Gap4" TargetType="HorizontalStackLayout">
+        <Setter Property="Spacing" Value="4"/>
+    </Style>
+    <Style x:Key="Row.Gap6" TargetType="HorizontalStackLayout">
+        <Setter Property="Spacing" Value="6"/>
+    </Style>
+    <Style x:Key="Row.Gap8" TargetType="HorizontalStackLayout">
+        <Setter Property="Spacing" Value="8"/>
+    </Style>
+    <Style x:Key="Sec.Note" TargetType="Label">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="16"/>
+    </Style>
+
+    <!-- ── List cards ── -->
+    <Style x:Key="Lst" TargetType="Border">
+        <Setter Property="Margin" Value="{StaticResource Gutter}"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource CardFill}, Dark={StaticResource CardFillDark}}"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Line}, Dark={StaticResource LineDark}}"/>
+        <Setter Property="StrokeThickness" Value="1"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R2}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Lst.Row" TargetType="Grid">
+        <Setter Property="MinimumHeightRequest" Value="50"/>
+        <Setter Property="Padding" Value="14,0"/>
+        <Setter Property="ColumnSpacing" Value="12"/>
+        <Setter Property="ColumnDefinitions" Value="20,*,Auto"/>
+        <Setter Property="app:App.StackOnLargeText" Value="True"/>
+    </Style>
+    <Style x:Key="Lst.RowSub" TargetType="Grid" BasedOn="{StaticResource Lst.Row}">
+        <Setter Property="MinimumHeightRequest" Value="58"/>
+    </Style>
+    <!-- This divider runs the full width between rows and above the tab bar, Reader bar, and Agents heading. -->
+    <Style x:Key="Lst.Divider" TargetType="BoxView">
+        <Setter Property="HeightRequest" Value="1"/>
+        <Setter Property="HorizontalOptions" Value="Fill"/>
+        <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Line}, Dark={StaticResource LineDark}}"/>
+    </Style>
+    <!-- The entire row is selectable in a single-selection CollectionView.
+         SelectionChanged reports the choice; the Selected state adds no highlight. -->
+    <DataTemplate x:Key="Lst.OptionTemplate" x:DataType="popups:ListPicker+Option">
+        <Grid MinimumHeightRequest="{Binding Height}" HeightRequest="{Binding Height}" SemanticProperties.Description="{Binding Spoken}">
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal"/>
+                        <VisualState x:Name="Selected">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="Transparent"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </VisualStateManager.VisualStateGroups>
+            <Grid Style="{StaticResource Lst.Row}" ColumnDefinitions="*,Auto">
+                <VerticalStackLayout VerticalOptions="Center">
+                    <Label Style="{StaticResource Lst.Title}" Text="{Binding Text}"/>
+                    <Label Style="{StaticResource Lst.Sub}" Text="{Binding Subtitle}" IsVisible="{Binding HasSubtitle}"/>
+                </VerticalStackLayout>
+                <Label Grid.Column="1" Style="{StaticResource Lst.Check}" Text="&#xE91C;" IsVisible="{Binding Selected}" InputTransparent="True"/>
+            </Grid>
+            <!-- Show the divider under every row except the last. -->
+            <BoxView Style="{StaticResource Lst.Divider}" VerticalOptions="End" IsVisible="{Binding Divider}"/>
+        </Grid>
+    </DataTemplate>
+    <!-- Hide the scroll indicator; long lists still scroll by dragging. -->
+    <Style x:Key="Lst.Options" TargetType="CollectionView">
+        <Setter Property="VerticalScrollBarVisibility" Value="Never"/>
+    </Style>
+    <Style x:Key="Lst.Title" TargetType="Label">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+        <Setter Property="LineBreakMode" Value="WordWrap"/>
+    </Style>
+    <Style x:Key="Lst.Value" TargetType="Label">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}"/>
+        <Setter Property="HorizontalTextAlignment" Value="End"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="LineBreakMode" Value="WordWrap"/>
+    </Style>
+    <Style x:Key="Lst.ValueOk" TargetType="Label" BasedOn="{StaticResource Lst.Value}">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ok}, Dark={StaticResource OkDark}}"/>
+    </Style>
+    <Style x:Key="Lst.ValueWork" TargetType="Label" BasedOn="{StaticResource Lst.Value}">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Work}, Dark={StaticResource WorkDark}}"/>
+    </Style>
+    <Style x:Key="Lst.ValueNeed" TargetType="Label" BasedOn="{StaticResource Lst.Value}">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Need}, Dark={StaticResource NeedDark}}"/>
+    </Style>
+    <Style x:Key="Lst.ValueMono" TargetType="Label" BasedOn="{StaticResource Lst.Value}">
+        <Setter Property="FontFamily" Value="GeistMono"/>
+        <Setter Property="FontSize" Value="12.5"/>
+    </Style>
+
+    <!-- ── Segmented controls for voice and appearance ── -->
+    <Style x:Key="Seg" TargetType="Border">
+        <Setter Property="Padding" Value="2"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SegFill}, Dark={StaticResource SegFillDark}}"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R1}"/>
+            </Setter.Value>
+        </Setter>
+        <!-- The voice control stays at 40% opacity while reading disables it, just like square buttons. -->
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal"/>
+                    <VisualState x:Name="Disabled">
+                        <VisualState.Setters>
+                            <Setter Property="Opacity" Value="0.4"/>
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+    <Style x:Key="Seg.Row" TargetType="HorizontalStackLayout">
+        <Setter Property="Spacing" Value="2"/>
+    </Style>
+    <Style x:Key="Seg.Cell" TargetType="Border">
+        <Setter Property="HeightRequest" Value="30"/>
+        <Setter Property="Padding" Value="10,0"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R0}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Seg.CellOn" TargetType="Border" BasedOn="{StaticResource Seg.Cell}">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SegOnFill}, Dark={StaticResource SegOnFillDark}}"/>
+    </Style>
+    <Style x:Key="Seg.Text" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistMedium"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Seg.TextOn" TargetType="Label" BasedOn="{StaticResource Seg.Text}">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+    </Style>
+    <!-- The voice summary has a 200-point limit so long provider and voice names truncate with an ellipsis. -->
+    <Style x:Key="Voice.Speaker" TargetType="Label" BasedOn="{StaticResource Seg.IconOn}">
+        <Setter Property="FontSize" Value="16"/>
+    </Style>
+    <Style x:Key="Voice.Summary" TargetType="Label" BasedOn="{StaticResource Seg.TextOn}">
+        <Setter Property="MaxLines" Value="1"/>
+        <Setter Property="LineBreakMode" Value="TailTruncation"/>
+        <Setter Property="MaximumWidthRequest" Value="200"/>
+    </Style>
+    <!-- Appearance options share the available width equally. -->
+    <pages:AppearanceGlyph x:Key="AppearanceGlyph"/>
+    <ControlTemplate x:Key="Seg.RadioTemplate">
+        <Border Padding="0,8" StrokeThickness="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="{StaticResource R0}"/>
+            </Border.StrokeShape>
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CheckedStates">
+                        <VisualState x:Name="Checked">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SegOnFill}, Dark={StaticResource SegOnFillDark}}"/>
+                                <Setter TargetName="SegmentText" Property="Label.TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+                                <Setter TargetName="SegmentGlyph" Property="Label.TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Unchecked">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="Transparent"/>
+                                <Setter TargetName="SegmentText" Property="Label.TextColor" Value="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}"/>
+                                <Setter TargetName="SegmentGlyph" Property="Label.TextColor" Value="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </VisualStateManager.VisualStateGroups>
+            <!-- The appearance icon comes from the option value and uses the same color as its text. -->
+            <HorizontalStackLayout Spacing="6" HorizontalOptions="Center">
+                <Label x:Name="SegmentGlyph" FontFamily="icons" FontSize="15" FontAutoScalingEnabled="False" VerticalTextAlignment="Center" Text="{Binding Value, Source={RelativeSource TemplatedParent}, x:DataType=RadioButton, Converter={StaticResource AppearanceGlyph}}"/>
+                <Label x:Name="SegmentText" FontFamily="GeistMedium" FontSize="13.5" FontAutoScalingEnabled="False" MaxLines="1" VerticalTextAlignment="Center" Text="{Binding Content, Source={RelativeSource TemplatedParent}, x:DataType=RadioButton}"/>
+            </HorizontalStackLayout>
+        </Border>
+    </ControlTemplate>
+    <Style x:Key="Seg.Radio" TargetType="RadioButton">
+        <Setter Property="ControlTemplate" Value="{StaticResource Seg.RadioTemplate}"/>
+    </Style>
+
+    <!-- ── Terminal keys and actions ── -->
+    <Style x:Key="Tray" TargetType="Border">
+        <Setter Property="Margin" Value="12,10,12,8"/>
+        <Setter Property="Padding" Value="6"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource TrayFill}, Dark={StaticResource TrayFillDark}}"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource TrayLine}, Dark={StaticResource TrayLineDark}}"/>
+        <Setter Property="StrokeThickness" Value="1"/>
+        <Setter Property="Shadow" Value="{StaticResource Shadow.Tray}"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R3}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Tray.Grid" TargetType="Grid">
+        <Setter Property="ColumnSpacing" Value="6"/>
+        <Setter Property="RowSpacing" Value="6"/>
+    </Style>
+    <Style x:Key="Tray.Sep" TargetType="BoxView">
+        <Setter Property="WidthRequest" Value="1"/>
+        <Setter Property="HeightRequest" Value="22"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Line2}, Dark={StaticResource Line2Dark}}"/>
+    </Style>
+    <!-- Keys are at least 40 points wide, with 8 points of padding on each side of the label.
+         This keeps Esc, Tab, Ctrl, Alt, and Enter visible on a 390-point phone. -->
+    <Style x:Key="TrayKey" TargetType="Button">
+        <Setter Property="FontFamily" Value="GeistMonoMedium"/>
+        <Setter Property="FontSize" Value="13.5"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource KeyFill}, Dark={StaticResource KeyFillDark}}"/>
+        <Setter Property="BorderWidth" Value="0"/>
+        <Setter Property="CornerRadius" Value="{StaticResource R1}"/>
+        <Setter Property="HeightRequest" Value="40"/>
+        <Setter Property="MinimumHeightRequest" Value="40"/>
+        <Setter Property="MinimumWidthRequest" Value="40"/>
+        <Setter Property="Padding" Value="8,0"/>
+        <Setter Property="LineBreakMode" Value="NoWrap"/>
+        <Setter Property="TextTransform" Value="None"/>
+        <Setter Property="Shadow" Value="{x:Null}"/>
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal"/>
+                    <VisualState x:Name="Disabled">
+                        <VisualState.Setters>
+                            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+    <!-- A modifier can apply to the next key or stay locked. The lock mark sits below the label. -->
+    <Style x:Key="TrayKey.On" TargetType="Button" BasedOn="{StaticResource TrayKey}">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource KeyOnFill}, Dark={StaticResource KeyOnFillDark}}"/>
+    </Style>
+    <Style x:Key="TrayKey.Icon" TargetType="Button" BasedOn="{StaticResource TrayKey}">
+        <Setter Property="FontFamily" Value="icons"/>
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="MinimumWidthRequest" Value="44"/>
+        <Setter Property="WidthRequest" Value="44"/>
+        <Setter Property="Padding" Value="0"/>
+    </Style>
+    <!-- Keep the icon highlighted while its control, such as the D-pad, is open. -->
+    <Style x:Key="TrayKey.IconOn" TargetType="Button" BasedOn="{StaticResource TrayKey.Icon}">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource KeyOnFill}, Dark={StaticResource KeyOnFillDark}}"/>
+    </Style>
+    <!-- The floating D-pad has no tray behind it. Its larger square keys use the tray’s opaque fill and
+         border so terminal text cannot show through them. -->
+    <Style x:Key="DPadKey" TargetType="Button" BasedOn="{StaticResource TrayKey.Icon}">
+        <Setter Property="WidthRequest" Value="52"/>
+        <Setter Property="HeightRequest" Value="52"/>
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource TrayFill}, Dark={StaticResource TrayFillDark}}"/>
+        <Setter Property="BorderColor" Value="{AppThemeBinding Light={StaticResource TrayLine}, Dark={StaticResource TrayLineDark}}"/>
+        <Setter Property="BorderWidth" Value="1"/>
+    </Style>
+    <Style x:Key="TrayKey.IconAcc" TargetType="Button" BasedOn="{StaticResource TrayKey.Icon}">
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+    </Style>
+    <!-- The back button uses the tray key style; its right margin leaves room before the title. -->
+    <Style x:Key="Hdr.Back" TargetType="Button" BasedOn="{StaticResource TrayKey.Icon}">
+        <Setter Property="Margin" Value="0,0,8,0"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <!-- Place the primary action last in the tray. -->
+    <Style x:Key="TrayKey.Primary" TargetType="Button" BasedOn="{StaticResource TrayKey}">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnAcc}, Dark={StaticResource OnAccDark}}"/>
+        <Setter Property="FontFamily" Value="GeistSemiBold"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Padding" Value="14,0"/>
+    </Style>
+    <Style x:Key="TrayKey.Lock" TargetType="BoxView">
+        <Setter Property="HeightRequest" Value="2"/>
+        <Setter Property="CornerRadius" Value="1"/>
+        <Setter Property="Margin" Value="9,0,9,5"/>
+        <Setter Property="HorizontalOptions" Value="Fill"/>
+        <Setter Property="VerticalOptions" Value="End"/>
+        <Setter Property="InputTransparent" Value="True"/>
+        <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+    </Style>
+    <!-- The pane pill shows the status dot, name, position within the tab, and a chevron. -->
+    <Style x:Key="Pill" TargetType="Border">
+        <Setter Property="HeightRequest" Value="40"/>
+        <Setter Property="Padding" Value="10,0,9,0"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource KeyFill}, Dark={StaticResource KeyFillDark}}"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R1}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Pill.Row" TargetType="HorizontalStackLayout" BasedOn="{StaticResource Row.Gap6}"/>
+    <Style x:Key="Pill.Dot" TargetType="Ellipse">
+        <Setter Property="WidthRequest" Value="6"/>
+        <Setter Property="HeightRequest" Value="6"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <!-- Limit the pane name to 44 points until the header measures the available width. -->
+    <Style x:Key="Pill.Name" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistSemiBold"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+        <Setter Property="MaximumWidthRequest" Value="44"/>
+        <Setter Property="MaxLines" Value="1"/>
+        <Setter Property="LineBreakMode" Value="TailTruncation"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Pill.Count" TargetType="Label" BasedOn="{StaticResource Grp.Count}">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+    </Style>
+
+    <!-- ── Buttons ── -->
+    <Style x:Key="Btn.Primary" TargetType="Button">
+        <Setter Property="FontFamily" Value="GeistSemiBold"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnAcc}, Dark={StaticResource OnAccDark}}"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+        <Setter Property="BorderWidth" Value="0"/>
+        <Setter Property="CornerRadius" Value="{StaticResource R1}"/>
+        <Setter Property="MinimumHeightRequest" Value="40"/>
+        <Setter Property="Padding" Value="14,0"/>
+        <Setter Property="TextTransform" Value="None"/>
+        <Setter Property="Shadow" Value="{x:Null}"/>
+    </Style>
+    <Style x:Key="Btn.Destructive" TargetType="Button" BasedOn="{StaticResource Btn.Primary}">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Need}, Dark={StaticResource NeedDark}}"/>
+    </Style>
+    <Style x:Key="Btn.Text" TargetType="Button">
+        <Setter Property="FontFamily" Value="GeistMedium"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="BorderWidth" Value="0"/>
+        <Setter Property="TextTransform" Value="None"/>
+        <Setter Property="Shadow" Value="{x:Null}"/>
+    </Style>
+    <Style x:Key="Btn.Outline" TargetType="Button" BasedOn="{StaticResource Btn.Text}">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="BorderColor" Value="{AppThemeBinding Light={StaticResource Line2}, Dark={StaticResource Line2Dark}}"/>
+        <Setter Property="BorderWidth" Value="1"/>
+        <Setter Property="CornerRadius" Value="{StaticResource R1}"/>
+        <Setter Property="Padding" Value="10,7"/>
+    </Style>
+    <!-- Reader playback controls use 40% opacity when disabled. -->
+    <Style x:Key="Btn.Square" TargetType="Button">
+        <Setter Property="FontFamily" Value="icons"/>
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnAcc}, Dark={StaticResource OnAccDark}}"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+        <Setter Property="BorderWidth" Value="0"/>
+        <Setter Property="CornerRadius" Value="{StaticResource R2}"/>
+        <Setter Property="WidthRequest" Value="52"/>
+        <Setter Property="HeightRequest" Value="52"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Shadow" Value="{x:Null}"/>
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal"/>
+                    <VisualState x:Name="Disabled">
+                        <VisualState.Setters>
+                            <Setter Property="Opacity" Value="0.4"/>
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+    <Style x:Key="Btn.SquareOutline" TargetType="Button" BasedOn="{StaticResource Btn.Square}">
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="BorderColor" Value="{AppThemeBinding Light={StaticResource Line2}, Dark={StaticResource Line2Dark}}"/>
+        <Setter Property="BorderWidth" Value="1"/>
+        <Setter Property="WidthRequest" Value="46"/>
+        <Setter Property="HeightRequest" Value="46"/>
+    </Style>
+
+    <!-- ── Form fields ── -->
+    <Style x:Key="Fld" TargetType="Border">
+        <Setter Property="MinimumHeightRequest" Value="46"/>
+        <Setter Property="Padding" Value="14,0"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource FieldFill}, Dark={StaticResource FieldFillDark}}"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Line2}, Dark={StaticResource Line2Dark}}"/>
+        <Setter Property="StrokeThickness" Value="1"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R2}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Fld.Entry" TargetType="Entry">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+        <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="VerticalTextAlignment" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Fld.Label" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistMedium"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}"/>
+        <Setter Property="Margin" Value="0,0,0,6"/>
+        <Setter Property="LineBreakMode" Value="WordWrap"/>
+    </Style>
+    <Style x:Key="Fld.LabelSuffixSpan" TargetType="Span">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+    </Style>
+    <Style x:Key="Fld.Hint" TargetType="Label">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+        <Setter Property="LineBreakMode" Value="WordWrap"/>
+        <Setter Property="Margin" Value="0,8,0,14"/>
+    </Style>
+    <!-- On the connection form, the port field sits to the right of the Mac address. -->
+    <Style x:Key="Form" TargetType="VerticalStackLayout">
+        <Setter Property="Spacing" Value="12"/>
+    </Style>
+    <Style x:Key="Form.HostPort" TargetType="Grid">
+        <Setter Property="ColumnSpacing" Value="10"/>
+        <Setter Property="ColumnDefinitions" Value="*,96"/>
+    </Style>
+
+    <!-- A 44-point search bar replaces the header. The field shows the query and match count;
+         previous, next, and close are unfilled 36-point icon buttons. -->
+    <Style x:Key="Find" TargetType="Grid">
+        <Setter Property="HeightRequest" Value="44"/>
+        <Setter Property="Padding" Value="12,0,8,0"/>
+        <Setter Property="ColumnDefinitions" Value="*,Auto,Auto,Auto"/>
+        <Setter Property="ColumnSpacing" Value="4"/>
+    </Style>
+    <Style x:Key="Find.Field" TargetType="Border" BasedOn="{StaticResource Fld}">
+        <Setter Property="MinimumHeightRequest" Value="34"/>
+        <Setter Property="HeightRequest" Value="34"/>
+        <Setter Property="Padding" Value="10,0"/>
+        <Setter Property="Margin" Value="0,0,4,0"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R1}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Find.Inner" TargetType="Grid">
+        <Setter Property="ColumnSpacing" Value="8"/>
+    </Style>
+    <Style x:Key="Find.Glyph" TargetType="Label" BasedOn="{StaticResource Lst.Glyph}">
+        <Setter Property="FontSize" Value="16"/>
+    </Style>
+    <Style x:Key="Find.Entry" TargetType="Entry" BasedOn="{StaticResource Fld.Entry}">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="14"/>
+    </Style>
+    <Style x:Key="Find.Count" TargetType="Label" BasedOn="{StaticResource Hdr.Sub}">
+        <Setter Property="FontSize" Value="11.5"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Find.Key" TargetType="Button" BasedOn="{StaticResource TrayKey.Icon}">
+        <Setter Property="WidthRequest" Value="36"/>
+        <Setter Property="MinimumWidthRequest" Value="36"/>
+        <Setter Property="HeightRequest" Value="36"/>
+        <Setter Property="MinimumHeightRequest" Value="36"/>
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+
+    <!-- The dictation draft sits below pane notices. It uses Geist Mono at the terminal’s text
+         size, a 28-point status row, and a five-bar level meter. -->
+    <Style x:Key="Draft" TargetType="Border">
+        <Setter Property="Padding" Value="12,6,12,10"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Bg}, Dark={StaticResource BgDark}}"/>
+    </Style>
+    <Style x:Key="Draft.Status" TargetType="Grid">
+        <Setter Property="HeightRequest" Value="28"/>
+    </Style>
+    <Style x:Key="Draft.State" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistMedium"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="LineBreakMode" Value="TailTruncation"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+    </Style>
+    <Style x:Key="Draft.Bar" TargetType="BoxView">
+        <Setter Property="WidthRequest" Value="4"/>
+        <Setter Property="HeightRequest" Value="14"/>
+        <Setter Property="CornerRadius" Value="2"/>
+        <Setter Property="Opacity" Value="0.25"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+    </Style>
+    <Style x:Key="Draft.Time" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistMono"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}"/>
+    </Style>
+    <Style x:Key="Draft.Chip" TargetType="Button">
+        <Setter Property="FontFamily" Value="GeistMonoMedium"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="HeightRequest" Value="28"/>
+        <Setter Property="MinimumHeightRequest" Value="28"/>
+        <Setter Property="MinimumWidthRequest" Value="36"/>
+        <Setter Property="Padding" Value="8,0"/>
+        <Setter Property="CornerRadius" Value="{StaticResource R1}"/>
+        <Setter Property="BorderWidth" Value="0"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource KeyFill}, Dark={StaticResource KeyFillDark}}"/>
+    </Style>
+    <Style x:Key="Draft.Provider" TargetType="Label">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+    </Style>
+    <Style x:Key="Draft.Notice" TargetType="Label">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="LineBreakMode" Value="WordWrap"/>
+    </Style>
+    <Style x:Key="Draft.Editor" TargetType="Editor">
+        <Setter Property="FontFamily" Value="GeistMono"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="AutoSize" Value="TextChanges"/>
+        <Setter Property="MinimumHeightRequest" Value="52"/>
+        <Setter Property="MaximumHeightRequest" Value="132"/>
+        <Setter Property="IsSpellCheckEnabled" Value="True"/>
+        <Setter Property="IsTextPredictionEnabled" Value="True"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+        <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource FieldFill}, Dark={StaticResource FieldFillDark}}"/>
+    </Style>
+    <Style x:Key="Draft.Live" TargetType="Border" BasedOn="{StaticResource Fld}">
+        <Setter Property="MinimumHeightRequest" Value="52"/>
+        <Setter Property="Padding" Value="10,8"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R1}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Draft.LiveText" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistMono"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="LineBreakMode" Value="WordWrap"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+    </Style>
+
+    <!-- ── Connection cards ── -->
+    <Style x:Key="Card" TargetType="Border">
+        <Setter Property="Padding" Value="14,12"/>
+        <Setter Property="Margin" Value="0,4,0,16"/>
+        <Setter Property="StrokeThickness" Value="1"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R2}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Card.Ok" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource OkSoft}, Dark={StaticResource OkSoftDark}}"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource OkEdge}, Dark={StaticResource OkEdgeDark}}"/>
+    </Style>
+    <Style x:Key="Card.Work" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource WorkSoft}, Dark={StaticResource WorkSoftDark}}"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource WorkEdge}, Dark={StaticResource WorkEdgeDark}}"/>
+    </Style>
+    <Style x:Key="Card.Need" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource NeedSoft}, Dark={StaticResource NeedSoftDark}}"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource NeedEdge}, Dark={StaticResource NeedEdgeDark}}"/>
+    </Style>
+    <Style x:Key="Card.Acc" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource AccSoft}, Dark={StaticResource AccSoftDark}}"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource AccEdge}, Dark={StaticResource AccEdgeDark}}"/>
+    </Style>
+    <Style x:Key="Card.Grid" TargetType="Grid">
+        <Setter Property="ColumnDefinitions" Value="Auto,*,Auto"/>
+        <Setter Property="RowDefinitions" Value="Auto,Auto,Auto"/>
+        <Setter Property="ColumnSpacing" Value="10"/>
+        <Setter Property="RowSpacing" Value="2"/>
+    </Style>
+    <Style x:Key="Card.Title" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistMedium"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+        <Setter Property="LineBreakMode" Value="WordWrap"/>
+    </Style>
+    <Style x:Key="Card.Body" TargetType="Label" BasedOn="{StaticResource Fld.Hint}">
+        <Setter Property="Margin" Value="0"/>
+    </Style>
+    <Style x:Key="Card.Buttons" TargetType="HorizontalStackLayout" BasedOn="{StaticResource Row.Gap8}"/>
+    <Style x:Key="Card.ButtonsUnder" TargetType="HorizontalStackLayout" BasedOn="{StaticResource Card.Buttons}">
+        <Setter Property="Margin" Value="0,8,0,0"/>
+    </Style>
+
+    <!-- ── Pane extras ── -->
+    <Style x:Key="LinkStrip" TargetType="Border">
+        <Setter Property="HeightRequest" Value="30"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="BackgroundColor" Value="{StaticResource Amber}"/>
+    </Style>
+    <Style x:Key="LinkStrip.Text" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistMedium"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="TextColor" Value="{StaticResource AmberInk}"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <!-- Show the terminal text size centered over the console during a pinch. -->
+    <Style x:Key="Badge" TargetType="Border">
+        <Setter Property="Padding" Value="20,10"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource CardFill}, Dark={StaticResource CardFillDark}}"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Line}, Dark={StaticResource LineDark}}"/>
+        <Setter Property="StrokeThickness" Value="1"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R2}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Badge.Text" TargetType="Label">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+    </Style>
+    <Style x:Key="Side" TargetType="Grid">
+        <Setter Property="RowDefinitions" Value="Auto,Auto,*,Auto"/>
+    </Style>
+    <Style x:Key="Side.Line" TargetType="BoxView">
+        <Setter Property="WidthRequest" Value="1"/>
+        <Setter Property="HorizontalOptions" Value="End"/>
+        <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Line}, Dark={StaticResource LineDark}}"/>
+    </Style>
+    <!-- ImageViewer sizes and places this frame, leaving the standard gutter at 1× zoom. -->
+    <Style x:Key="Viewer.Frame" TargetType="Border">
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource ImgLine}, Dark={StaticResource ImgLineDark}}"/>
+        <Setter Property="StrokeThickness" Value="1"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R1}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ── Tab bar: 48 points high above the bottom inset, with no indicator ── -->
+    <Style x:Key="TabBar" TargetType="Grid">
+        <Setter Property="HeightRequest" Value="48"/>
+        <Setter Property="Padding" Value="10,8,10,0"/>
+        <Setter Property="ColumnDefinitions" Value="*,*,*"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Bg}, Dark={StaticResource BgDark}}"/>
+    </Style>
+    <Style x:Key="Tab.Item" TargetType="VerticalStackLayout">
+        <Setter Property="Spacing" Value="3"/>
+    </Style>
+    <!-- The tab item supplies the accessible name and selected state. -->
+    <Style x:Key="Tab.Text" TargetType="Label">
+        <Setter Property="AutomationProperties.IsInAccessibleTree" Value="False"/>
+        <Setter Property="FontFamily" Value="GeistMedium"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Tab.TextOn" TargetType="Label" BasedOn="{StaticResource Tab.Text}">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+    </Style>
+
+    <!-- ── Sheets and dialogs ── -->
+    <Style x:Key="Scrim" TargetType="Grid">
+        <Setter Property="BackgroundColor" Value="{StaticResource Overlay}"/>
+    </Style>
+    <Style x:Key="Sht" TargetType="Border">
+        <Setter Property="VerticalOptions" Value="End"/>
+        <Setter Property="Padding" Value="0,8,0,30"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource CardFill}, Dark={StaticResource CardFillDark}}"/>
+        <Setter Property="Shadow" Value="{StaticResource Shadow.Sheet}"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="16,16,0,0"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Sht.Grab" TargetType="BoxView">
+        <Setter Property="WidthRequest" Value="36"/>
+        <Setter Property="HeightRequest" Value="4"/>
+        <Setter Property="CornerRadius" Value="2"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="Margin" Value="0,0,0,10"/>
+        <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Line2}, Dark={StaticResource Line2Dark}}"/>
+    </Style>
+    <!-- Limit swipe-to-dismiss to the grab band (8 points of top padding, 4 for the handle, and 10 below it)
+         so Cancel and Done still receive taps. -->
+    <Style x:Key="Sht.DragZone" TargetType="Grid">
+        <Setter Property="VerticalOptions" Value="Start"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="HeightRequest" Value="22"/>
+    </Style>
+    <Style x:Key="Sht.Cards" TargetType="VerticalStackLayout">
+        <Setter Property="Spacing" Value="10"/>
+    </Style>
+    <Style x:Key="Sht.Head" TargetType="Grid">
+        <Setter Property="Padding" Value="16,0,16,8"/>
+        <Setter Property="ColumnDefinitions" Value="*,Auto"/>
+    </Style>
+    <Style x:Key="Sht.Title" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistSemiBold"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Sht.Action" TargetType="Button" BasedOn="{StaticResource Btn.Text}">
+        <Setter Property="Padding" Value="0"/>
+    </Style>
+    <Style x:Key="Sht.Foot" TargetType="Label">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+        <Setter Property="Padding" Value="16,10,16,0"/>
+    </Style>
+    <!-- The dialog centers the card and its shadow layer over an inset scrim. -->
+    <Style x:Key="Dlg.Grid" TargetType="Grid" BasedOn="{StaticResource Scrim}">
+        <Setter Property="Padding" Value="24"/>
+    </Style>
+    <Style x:Key="Dlg.Frame" TargetType="Grid">
+        <Setter Property="MaximumWidthRequest" Value="440"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <!-- Android uses a hardware shadow on the borderless layer; a bordered card would blur in software
+         each time it opens. Inset the layer by 1 point so the opaque card hides everything but the shadow. -->
+    <Style x:Key="Dlg.Shadow" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource CardFill}, Dark={StaticResource CardFillDark}}"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="Margin" Value="1"/>
+        <Setter Property="InputTransparent" Value="True"/>
+        <Setter Property="Shadow" Value="{AppThemeBinding Light={StaticResource Shadow.Dlg}, Dark={x:Null}}"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R2}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Dlg" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource CardFill}, Dark={StaticResource CardFillDark}}"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Line}, Dark={StaticResource LineDark}}"/>
+        <Setter Property="StrokeThickness" Value="1"/>
+        <Setter Property="MaximumWidthRequest" Value="440"/>
+        <Setter Property="MaximumHeightRequest" Value="620"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R2}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Dlg.Head" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="Padding" Value="24,24,24,0"/>
+    </Style>
+    <!-- Keep column spacing at zero so a hidden icon does not indent the title. -->
+    <Style x:Key="Dlg.HeadGrid" TargetType="Grid">
+        <Setter Property="ColumnSpacing" Value="0"/>
+    </Style>
+    <Style x:Key="Dlg.Title" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistSemiBold"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+        <Setter Property="HorizontalTextAlignment" Value="Start"/>
+        <Setter Property="VerticalTextAlignment" Value="Center"/>
+        <Setter Property="LineBreakMode" Value="TailTruncation"/>
+        <Setter Property="MaxLines" Value="1"/>
+    </Style>
+    <Style x:Key="Dlg.Scroll" TargetType="ScrollView">
+        <Setter Property="MaximumHeightRequest" Value="360"/>
+        <Setter Property="Padding" Value="24,16,24,0"/>
+        <Setter Property="VerticalScrollBarVisibility" Value="Default"/>
+        <Setter Property="HorizontalScrollBarVisibility" Value="Never"/>
+    </Style>
+    <Style x:Key="Dlg.Body" TargetType="Label">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}"/>
+        <Setter Property="LineBreakMode" Value="WordWrap"/>
+    </Style>
+    <Style x:Key="Dlg.Foot" TargetType="Grid">
+        <Setter Property="RowSpacing" Value="12"/>
+        <Setter Property="Padding" Value="24,20,24,24"/>
+    </Style>
+    <Style x:Key="Wait.Frame" TargetType="Grid">
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Busy" TargetType="Border" BasedOn="{StaticResource Dlg}">
+        <Setter Property="WidthRequest" Value="320"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Wait.Stack" TargetType="VerticalStackLayout">
+        <Setter Property="Padding" Value="24"/>
+        <Setter Property="Spacing" Value="12"/>
+    </Style>
+    <Style x:Key="Busy.Spinner" TargetType="ActivityIndicator">
+        <Setter Property="WidthRequest" Value="44"/>
+        <Setter Property="HeightRequest" Value="44"/>
+        <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+    </Style>
+
+    <!-- ── Reader ── -->
+    <Style x:Key="Reader.Body" TargetType="Editor">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="17"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+        <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+        <Setter Property="Margin" Value="20,14,20,0"/>
+    </Style>
+    <Style x:Key="Reader.Bar" TargetType="Grid">
+        <Setter Property="MinimumHeightRequest" Value="76"/>
+        <Setter Property="Padding" Value="20,0"/>
+        <Setter Property="ColumnSpacing" Value="12"/>
+        <Setter Property="ColumnDefinitions" Value="Auto,Auto,*"/>
+    </Style>
+
+    <!-- ── Create and arrange spaces and panes ── -->
+    <Style x:Key="Sec.Key" TargetType="Border">
+        <Setter Property="WidthRequest" Value="32"/>
+        <Setter Property="HeightRequest" Value="32"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Sec.Plus" TargetType="Label" BasedOn="{StaticResource Card.Glyph}">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+    </Style>
+    <!-- In an expanded space, the last row puts Add in the index column and More at the trailing edge. -->
+    <Style x:Key="Row.Actions" TargetType="Grid">
+        <Setter Property="MinimumHeightRequest" Value="40"/>
+        <Setter Property="Padding" Value="53,0,14,0"/>
+        <Setter Property="ColumnDefinitions" Value="Auto,*,Auto"/>
+    </Style>
+    <Style x:Key="Row.ActKey" TargetType="Border">
+        <Setter Property="WidthRequest" Value="34"/>
+        <Setter Property="HeightRequest" Value="32"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource KeyFill}, Dark={StaticResource KeyFillDark}}"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R1}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Row.ActPlus" TargetType="Label" BasedOn="{StaticResource Card.Glyph}">
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+    </Style>
+    <Style x:Key="Row.ActMore" TargetType="Label" BasedOn="{StaticResource Card.Glyph}">
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}"/>
+    </Style>
+    <!-- The pane pill takes the available width before the fixed 40-point Add button. Add, theme,
+         and Mac actions stay side by side without gaps regardless of the pane name. -->
+    <Style x:Key="Hdr.Lead" TargetType="Grid">
+        <Setter Property="ColumnDefinitions" Value="*,Auto"/>
+        <Setter Property="ColumnSpacing" Value="8"/>
+    </Style>
+    <Style x:Key="Hdr.IconAcc" TargetType="Label" BasedOn="{StaticResource Hdr.Icon}">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+    </Style>
+    <!-- The 22-by-14 layout map outlines each pane, fills the current one, and dims mod panes or closed terminals. -->
+    <Style x:Key="Map" TargetType="AbsoluteLayout">
+        <Setter Property="WidthRequest" Value="22"/>
+        <Setter Property="HeightRequest" Value="14"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Map.Cell" TargetType="Border">
+        <Setter Property="Margin" Value="0.5"/>
+        <Setter Property="StrokeThickness" Value="1"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="1.5"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Map.CellOn" TargetType="Border" BasedOn="{StaticResource Map.Cell}">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+    </Style>
+    <Style x:Key="Map.CellDim" TargetType="Border" BasedOn="{StaticResource Map.Cell}">
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Line2}, Dark={StaticResource Line2Dark}}"/>
+    </Style>
+    <!-- The 58-point layout map sits below the open tab. Tap a named terminal to open it.
+         The current pane is filled; mod panes and closed terminals are dimmed and cannot be tapped. -->
+    <Style x:Key="Map.Large" TargetType="AbsoluteLayout">
+        <Setter Property="HeightRequest" Value="58"/>
+        <Setter Property="HorizontalOptions" Value="Fill"/>
+        <Setter Property="Margin" Value="37,0,16,6"/>
+    </Style>
+    <!-- Put horizontal padding on the tile, not its label. iOS ignores label padding when truncating,
+         which would place the ellipsis against the border. -->
+    <Style x:Key="Map.Piece" TargetType="Border">
+        <Setter Property="Margin" Value="1"/>
+        <Setter Property="Padding" Value="4,0"/>
+        <Setter Property="StrokeThickness" Value="1.2"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="5"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Map.PieceOn" TargetType="Border" BasedOn="{StaticResource Map.Piece}">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+    </Style>
+    <Style x:Key="Map.PieceDim" TargetType="Border" BasedOn="{StaticResource Map.Piece}">
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Line2}, Dark={StaticResource Line2Dark}}"/>
+    </Style>
+    <Style x:Key="Map.PieceText" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistMedium"/>
+        <Setter Property="FontSize" Value="11.5"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}"/>
+        <Setter Property="MaxLines" Value="1"/>
+        <Setter Property="LineBreakMode" Value="TailTruncation"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="Map.PieceTextOn" TargetType="Label" BasedOn="{StaticResource Map.PieceText}">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnAcc}, Dark={StaticResource OnAccDark}}"/>
+    </Style>
+    <!-- The pane sheet mirrors the herdr-app pane header: icon, name, folder, and menu above the
+         action buttons and their dividers. Below it, the space lists its tabs and shows the map under the open tab. -->
+    <Style x:Key="PSheet.Block" TargetType="Border">
+        <Setter Property="Margin" Value="16,0,16,0"/>
+        <Setter Property="StrokeThickness" Value="1"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Line}, Dark={StaticResource LineDark}}"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource R2}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="PSheet.Head" TargetType="Grid">
+        <Setter Property="HeightRequest" Value="44"/>
+        <Setter Property="Padding" Value="12,0,2,0"/>
+        <Setter Property="ColumnSpacing" Value="8"/>
+        <Setter Property="ColumnDefinitions" Value="Auto,Auto,*,Auto"/>
+    </Style>
+    <Style x:Key="PSheet.Name" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistMedium"/>
+        <Setter Property="FontSize" Value="13.5"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+        <Setter Property="MaxLines" Value="1"/>
+        <Setter Property="LineBreakMode" Value="TailTruncation"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="PSheet.Folder" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistMono"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+        <Setter Property="MaxLines" Value="1"/>
+        <Setter Property="LineBreakMode" Value="HeadTruncation"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="PSheet.Act" TargetType="VerticalStackLayout">
+        <Setter Property="Padding" Value="2,9,2,8"/>
+        <Setter Property="Spacing" Value="4"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+    </Style>
+    <Style x:Key="PSheet.ActGlyph" TargetType="Label" BasedOn="{StaticResource Lst.Glyph}">
+        <Setter Property="FontSize" Value="19"/>
+    </Style>
+    <Style x:Key="PSheet.ActText" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistMedium"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontAutoScalingEnabled" Value="False"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <!-- Allow two centered lines so longer translations fit in a quarter of the screen width. -->
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+        <Setter Property="LineBreakMode" Value="WordWrap"/>
+        <Setter Property="MaxLines" Value="2"/>
+    </Style>
+    <Style x:Key="PSheet.ActLine" TargetType="BoxView">
+        <Setter Property="WidthRequest" Value="1"/>
+        <Setter Property="HorizontalOptions" Value="Start"/>
+        <Setter Property="InputTransparent" Value="True"/>
+        <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Line}, Dark={StaticResource LineDark}}"/>
+    </Style>
+    <Style x:Key="PSheet.Acts" TargetType="Grid">
+        <Setter Property="ColumnSpacing" Value="0"/>
+    </Style>
+    <Style x:Key="PSheet.Space" TargetType="Label" BasedOn="{StaticResource Sec.Title}">
+        <Setter Property="Padding" Value="16,14,16,4"/>
+    </Style>
+    <Style x:Key="PSheet.Tab" TargetType="Grid">
+        <Setter Property="MinimumHeightRequest" Value="46"/>
+        <Setter Property="Padding" Value="0,0,6,0"/>
+        <Setter Property="ColumnDefinitions" Value="*,Auto"/>
+    </Style>
+    <Style x:Key="PSheet.TabOpen" TargetType="Grid">
+        <Setter Property="Padding" Value="16,0,0,0"/>
+        <Setter Property="ColumnSpacing" Value="11"/>
+        <Setter Property="ColumnDefinitions" Value="Auto,24,*"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+    </Style>
+    <Style x:Key="PSheet.TabName" TargetType="Label">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+        <Setter Property="MaxLines" Value="1"/>
+        <Setter Property="LineBreakMode" Value="TailTruncation"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="PSheet.TabNameOn" TargetType="Label" BasedOn="{StaticResource PSheet.TabName}">
+        <Setter Property="FontFamily" Value="GeistSemiBold"/>
+    </Style>
+    <!-- A status note aligns with the text column of the menu’s action rows. -->
+    <Style x:Key="Lst.Note" TargetType="Label">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <!-- The menu heading leaves no icon gap when there is no icon.
+         Section labels use the same spacing as herdr-app’s separator. -->
+    <Style x:Key="Menu.Named" TargetType="Grid">
+        <Setter Property="ColumnSpacing" Value="8"/>
+    </Style>
+    <Style x:Key="Menu.NamedBare" TargetType="Grid">
+        <Setter Property="ColumnSpacing" Value="0"/>
+    </Style>
+    <Style x:Key="Menu.Section" TargetType="Label" BasedOn="{StaticResource Sec.Title}">
+        <Setter Property="Padding" Value="16,10,16,2"/>
+    </Style>
+    <Style x:Key="Menu.Gap" TargetType="BoxView" BasedOn="{StaticResource Lst.Divider}">
+        <Setter Property="Margin" Value="16,5"/>
+    </Style>
+    <!-- The New space sheet shows the current folder as a path and offers a back button while browsing. -->
+    <Style x:Key="List.Head" TargetType="Grid" BasedOn="{StaticResource Sht.Head}">
+        <Setter Property="ColumnDefinitions" Value="Auto,*,Auto"/>
+        <Setter Property="ColumnSpacing" Value="0"/>
+    </Style>
+    <Style x:Key="List.Back" TargetType="Button" BasedOn="{StaticResource TrayKey.Icon}">
+        <Setter Property="Margin" Value="0,0,8,0"/>
+        <Setter Property="WidthRequest" Value="36"/>
+        <Setter Property="MinimumWidthRequest" Value="36"/>
+        <Setter Property="HeightRequest" Value="36"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="List.Path" TargetType="Label">
+        <Setter Property="FontFamily" Value="GeistMono"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}"/>
+        <Setter Property="Padding" Value="16,0,16,8"/>
+        <Setter Property="MaxLines" Value="1"/>
+        <Setter Property="LineBreakMode" Value="HeadTruncation"/>
+    </Style>
+    <Style x:Key="List.PathOn" TargetType="Span">
+        <Setter Property="FontFamily" Value="GeistMonoMedium"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink}, Dark={StaticResource InkDark}}"/>
+    </Style>
+    <Style x:Key="List.Section" TargetType="Label" BasedOn="{StaticResource Sec.Title}">
+        <Setter Property="Padding" Value="16,10,16,2"/>
+    </Style>
+    <Style x:Key="List.Note" TargetType="Label" BasedOn="{StaticResource Lst.Note}">
+        <Setter Property="Padding" Value="16,8"/>
+    </Style>
+    <Style x:Key="List.ItemTitle" TargetType="Label" BasedOn="{StaticResource Lst.Title}">
+        <Setter Property="MaxLines" Value="1"/>
+        <Setter Property="LineBreakMode" Value="TailTruncation"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+    <Style x:Key="List.ItemSub" TargetType="Label" BasedOn="{StaticResource Lst.Sub}">
+        <Setter Property="MaxLines" Value="1"/>
+        <Setter Property="LineBreakMode" Value="HeadTruncation"/>
+    </Style>
+    <Style x:Key="List.Trail" TargetType="Label" BasedOn="{StaticResource Row.PaneAddr}"/>
+    <Style x:Key="List.Divider" TargetType="BoxView" BasedOn="{StaticResource Lst.Divider}">
+        <Setter Property="Margin" Value="16,5"/>
+    </Style>
+    <Style x:Key="List.Foot" TargetType="Button" BasedOn="{StaticResource Btn.Primary}">
+        <Setter Property="Margin" Value="16,10,16,0"/>
+    </Style>
+    <!-- The parent-folder row flips its icon. The entire row is selectable, without adding a highlight. -->
+    <DataTemplate x:Key="List.ItemTemplate" x:DataType="popups:ListSheet+Item">
+        <Grid HeightRequest="{Binding Height}" SemanticProperties.Description="{Binding Spoken}">
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal"/>
+                        <VisualState x:Name="Selected">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="Transparent"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </VisualStateManager.VisualStateGroups>
+            <Grid Style="{StaticResource Lst.Row}">
+                <Label Style="{StaticResource Lst.Glyph}" Text="{Binding Glyph}" Rotation="{Binding GlyphTurn}"/>
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                    <Label Style="{StaticResource List.ItemTitle}" Text="{Binding Text}">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding Dim}" Value="True">
+                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                    <Label Style="{StaticResource List.ItemSub}" Text="{Binding Subtitle}" IsVisible="{Binding HasSubtitle}"/>
+                </VerticalStackLayout>
+                <Label Grid.Column="2" Style="{StaticResource Lst.Chev}" Text="{Binding Trail}"/>
+            </Grid>
+        </Grid>
+    </DataTemplate>
+    <!-- Filter mode places the option count at the right of the heading, above the filter field. -->
+    <Style x:Key="List.Count" TargetType="Label" BasedOn="{StaticResource Lst.Sub}">
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="Margin" Value="8,0,0,0"/>
+    </Style>
+    <Style x:Key="List.Field" TargetType="Border" BasedOn="{StaticResource Fld}">
+        <Setter Property="Margin" Value="16,0,16,6"/>
+    </Style>
+    <!-- The form wraps its status or error message without truncation and places the primary action at the right. -->
+    <Style x:Key="FSheet" TargetType="VerticalStackLayout">
+        <Setter Property="Padding" Value="16,0,16,4"/>
+        <Setter Property="Spacing" Value="10"/>
+    </Style>
+    <Style x:Key="FSheet.Note" TargetType="Label">
+        <Setter Property="FontFamily" Value="Geist"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+        <Setter Property="LineBreakMode" Value="WordWrap"/>
+    </Style>
+    <Style x:Key="FSheet.Error" TargetType="Label" BasedOn="{StaticResource FSheet.Note}">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Need}, Dark={StaticResource NeedDark}}"/>
+    </Style>
+    <Style x:Key="FSheet.Buttons" TargetType="HorizontalStackLayout">
+        <Setter Property="HorizontalOptions" Value="End"/>
+        <Setter Property="Spacing" Value="8"/>
+        <Setter Property="Margin" Value="0,4,0,0"/>
+    </Style>
+</ResourceDictionary>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="HerdrRemote.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:HerdrRemote.Pages"
+    Title="Remote Shell"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False"
+    Shell.PresentationMode="ModalNotAnimated">
+
+    <!-- Pages draw their own tab bar. Keep Shell's hidden tab bar so it preserves page state across switches,
+         including pasted text when visiting Voices. Open the workspace list first. -->
+    <TabBar>
+        <ShellContent
+            Title="Herdr"
+            ContentTemplate="{DataTemplate local:Herdr}"
+            Route="Herdr"
+            Shell.TabBarIsVisible="False" />
+
+        <ShellContent
+            Title="Reader"
+            ContentTemplate="{DataTemplate local:Reader}"
+            Route="Reader"
+            Shell.TabBarIsVisible="False" />
+
+        <ShellContent
+            Title="Voices"
+            ContentTemplate="{DataTemplate local:Voices}"
+            Route="Voices"
+            Shell.TabBarIsVisible="False" />
+    </TabBar>
+
+</Shell>

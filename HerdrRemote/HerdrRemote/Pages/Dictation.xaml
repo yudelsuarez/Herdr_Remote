@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:pages="clr-namespace:HerdrRemote.Pages" x:Class="HerdrRemote.Pages.Dictation" Title="Dictation" Style="{StaticResource Page}">
+    <!-- Dictation engine, language, and OpenAI model settings, independent of the reading voice.
+         API keys come from the Providers page; labels are set in code. -->
+    <Grid RowDefinitions="Auto,*,Auto">
+        <pages:Header x:Name="Header" Grid.Row="0" BackVisible="True" BackTapped="Back_Clicked"/>
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout>
+                <Label x:Name="Lbl_Note" Style="{StaticResource Sht.Foot}"/>
+                <pages:InfoList x:Name="Rows" Tapped="Rows_Tapped"/>
+            </VerticalStackLayout>
+        </ScrollView>
+        <pages:IsBusyBox x:Name="IsBusyBox" Grid.Row="0" Grid.RowSpan="3" IsVisible="False"/>
+    </Grid>
+</ContentPage>

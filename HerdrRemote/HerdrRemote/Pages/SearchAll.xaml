@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:pages="clr-namespace:HerdrRemote.Pages" x:Class="HerdrRemote.Pages.SearchAll" Title="SearchAll" Style="{StaticResource Page}">
+    <!-- Search all panes: the header with the app's own Back, one field (search key runs the search), then the results grouped per
+         terminal, built in code as each read arrives. -->
+    <Grid RowDefinitions="Auto,Auto,*">
+        <pages:Header x:Name="Header" Grid.Row="0" BackVisible="True" BackTapped="Back_Clicked"/>
+        <Border Grid.Row="1" Style="{StaticResource Find.Field}" Margin="12,8,12,8">
+            <Grid Style="{StaticResource Find.Inner}" ColumnDefinitions="Auto,*">
+                <Label Grid.Column="0" Text="&#xE906;" Style="{StaticResource Find.Glyph}" AutomationProperties.IsInAccessibleTree="False"/>
+                <Entry x:Name="Field" AutomationId="SearchAllField" Grid.Column="1" Style="{StaticResource Find.Entry}" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False"
+                       ReturnType="Search" Completed="Field_Completed"/>
+            </Grid>
+        </Border>
+        <ScrollView Grid.Row="2">
+            <VerticalStackLayout x:Name="Results"/>
+        </ScrollView>
+    </Grid>
+</ContentPage>

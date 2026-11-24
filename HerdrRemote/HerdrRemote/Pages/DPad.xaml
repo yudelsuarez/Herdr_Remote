@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<VerticalStackLayout xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                     x:Class="HerdrRemote.Pages.DPad" HorizontalOptions="Start" VerticalOptions="Start"
+                     Spacing="6" Padding="6" InputTransparent="True" CascadeInputTransparent="False">
+    <!-- Draggable D-pad with configurable corners around fixed arrows and Enter. It overlays the terminal without resizing it.
+         The icon font supplies back for left, chev for right, down, and an inverted down for up. -->
+    <!-- Each key has an opaque DPadKey fill to stay readable over terminal text; padding preserves the pad's footprint.
+         Use a layout, not a ContentView: on iOS, making a ContentView input-transparent also disables its children.
+         The layout lets keys and the grab bar receive touches while gaps pass taps to the terminal on both platforms. -->
+    <Grid x:Name="Grab" HeightRequest="24" HorizontalOptions="Fill" BackgroundColor="Transparent">
+        <!-- The grab bar uses the keys' opaque fill to stay readable over terminal text. -->
+        <Border WidthRequest="68" HeightRequest="20" HorizontalOptions="Center" VerticalOptions="Center" Padding="0" StrokeThickness="1"
+                BackgroundColor="{AppThemeBinding Light={StaticResource TrayFill}, Dark={StaticResource TrayFillDark}}"
+                Stroke="{AppThemeBinding Light={StaticResource TrayLine}, Dark={StaticResource TrayLineDark}}" InputTransparent="True">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="10"/>
+            </Border.StrokeShape>
+            <BoxView WidthRequest="44" HeightRequest="5" CornerRadius="3" HorizontalOptions="Center" VerticalOptions="Center"
+                     Color="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}"/>
+        </Border>
+        <Grid.GestureRecognizers>
+            <PanGestureRecognizer PanUpdated="Grab_PanUpdated"/>
+        </Grid.GestureRecognizers>
+    </Grid>
+    <Grid ColumnDefinitions="52,52,52" RowDefinitions="52,52,52" ColumnSpacing="6" RowSpacing="6" InputTransparent="True" CascadeInputTransparent="False">
+        <Button x:Name="Corner_TL" Grid.Row="0" Grid.Column="0" Style="{StaticResource DPadKey}" Pressed="Corner_Pressed" Released="Repeat_Released" Clicked="Corner_Clicked"/>
+        <Button x:Name="Btn_Up" Grid.Row="0" Grid.Column="1" Text="&#xE909;" Rotation="180" CommandParameter="up" Style="{StaticResource DPadKey}" Pressed="Repeat_Pressed" Released="Repeat_Released"/>
+        <Button x:Name="Corner_TR" Grid.Row="0" Grid.Column="2" Style="{StaticResource DPadKey}" Pressed="Corner_Pressed" Released="Repeat_Released" Clicked="Corner_Clicked"/>
+        <Button x:Name="Btn_Left" Grid.Row="1" Grid.Column="0" Text="&#xE908;" CommandParameter="left" Style="{StaticResource DPadKey}" Pressed="Repeat_Pressed" Released="Repeat_Released"/>
+        <Button x:Name="Btn_Enter" Grid.Row="1" Grid.Column="1" Text="&#xE959;" CommandParameter="enter" Style="{StaticResource DPadKey}" Clicked="Key_Clicked"/>
+        <Button x:Name="Btn_Right" Grid.Row="1" Grid.Column="2" Text="&#xE907;" CommandParameter="right" Style="{StaticResource DPadKey}" Pressed="Repeat_Pressed" Released="Repeat_Released"/>
+        <Button x:Name="Btn_Down" Grid.Row="2" Grid.Column="1" Text="&#xE909;" CommandParameter="down" Style="{StaticResource DPadKey}" Pressed="Repeat_Pressed" Released="Repeat_Released"/>
+        <Button x:Name="Corner_BL" Grid.Row="2" Grid.Column="0" Style="{StaticResource DPadKey}" Pressed="Corner_Pressed" Released="Repeat_Released" Clicked="Corner_Clicked"/>
+        <Button x:Name="Corner_BR" Grid.Row="2" Grid.Column="2" Style="{StaticResource DPadKey}" Pressed="Corner_Pressed" Released="Repeat_Released" Clicked="Corner_Clicked"/>
+    </Grid>
+</VerticalStackLayout>

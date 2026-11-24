@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<defs>
+ <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d5e7ff"/><stop offset=".32" stop-color="#609ff8"/><stop offset=".65" stop-color="#315bcb"/><stop offset="1" stop-color="#8ab7ff"/></linearGradient>
+ <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#253b68"/><stop offset=".42" stop-color="#151e32"/><stop offset="1" stop-color="#0c1323"/></linearGradient>
+ <linearGradient id="echo" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#3467de" stop-opacity=".2"/><stop offset=".6" stop-color="#609ff8" stop-opacity=".7"/><stop offset="1" stop-color="#c7dcff" stop-opacity=".9"/></linearGradient>
+ <linearGradient id="shine" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#bfd8ff" stop-opacity=".16"/><stop offset="1" stop-color="#bfd8ff" stop-opacity="0"/></linearGradient>
+</defs>
+<g transform="translate(512 512) scale(0.95) translate(-499 -478)">
+<path d="M332 307 V290 Q332 251 371 251 H717 Q757 251 757 291 V580 Q757 619 718 619 H700" fill="none" stroke="url(#echo)" stroke-width="16" stroke-linecap="round"/>
+<rect x="253" y="356" width="465" height="350" rx="65" fill="#050811" opacity=".2"/>
+<rect x="251" y="346" width="465" height="350" rx="62" fill="#050811" opacity=".35"/>
+<rect x="246" y="328" width="465" height="350" rx="60" fill="#1c3370"/>
+<rect x="241" y="311" width="465" height="350" rx="60" fill="url(#rim)"/>
+<rect x="257" y="327" width="433" height="318" rx="45" fill="#0b1224"/>
+<rect x="263" y="333" width="421" height="306" rx="40" fill="url(#glass)"/>
+<path d="M303 336 H609 L330 615 H303 Q267 615 267 579 V376 Q267 336 303 336Z" fill="url(#shine)"/>
+<path d="M397 424 L469 481 L397 538" fill="none" stroke="#e1ebff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M514 538 H577" fill="none" stroke="#a9cdff" stroke-width="24" stroke-linecap="round"/>
+<path d="M650 251 H680" stroke="#9ec6ff" stroke-width="16" stroke-linecap="round"/>
+<path d="M702 251 H713" stroke="#e0edff" stroke-width="16" stroke-linecap="round"/>
+</g>
+</svg>

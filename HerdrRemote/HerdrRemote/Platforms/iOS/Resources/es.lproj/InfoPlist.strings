@@ -1,0 +1,7 @@
+/* See en.lproj for the contract. */
+
+"NSLocalNetworkUsageDescription" = "Remote Shell se conecta a herdr en tu Mac por tu Wi-Fi. Sin esto, la app no puede mostrar tus spaces.";
+"NSPhotoLibraryAddUsageDescription" = "Remote Shell guarda en tus fotos las imágenes que muestran tus agentes cuando tocas Guardar en fotos.";
+"NSCameraUsageDescription" = "Remote Shell usa la cámara cuando tocas Cámara para enviar una foto a tu agente.";
+"NSMicrophoneUsageDescription" = "Remote Shell escucha solo mientras dictas un mensaje para tu agente.";
+"NSSpeechRecognitionUsageDescription" = "Remote Shell convierte tu dictado en texto en este dispositivo.";

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="HerdrRemote.Pages.DictationDraft">
+    <!-- Draft overlay below the notice slot: it never resizes the terminal and scrolls within short terminal cells.
+         It shows state, input level, timer, language, provider, notices and Retry, then text and actions.
+         Text is read-only while listening and editable otherwise; labels are set in code. -->
+    <Border Style="{StaticResource Draft}">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="6">
+            <Grid Grid.Row="0" Style="{StaticResource Draft.Status}" ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="8">
+                <Label x:Name="Lbl_State" Grid.Column="0" Style="{StaticResource Draft.State}"/>
+                <HorizontalStackLayout x:Name="Meter" Grid.Column="1" Spacing="2" VerticalOptions="Center" IsVisible="False">
+                    <BoxView Style="{StaticResource Draft.Bar}"/>
+                    <BoxView Style="{StaticResource Draft.Bar}"/>
+                    <BoxView Style="{StaticResource Draft.Bar}"/>
+                    <BoxView Style="{StaticResource Draft.Bar}"/>
+                    <BoxView Style="{StaticResource Draft.Bar}"/>
+                </HorizontalStackLayout>
+                <Label x:Name="Lbl_Time" Grid.Column="2" Style="{StaticResource Draft.Time}" IsVisible="False"/>
+                <Button x:Name="Btn_Language" Grid.Column="3" Style="{StaticResource Draft.Chip}" Clicked="Language_Clicked"/>
+                <Label x:Name="Lbl_Provider" Grid.Column="4" Style="{StaticResource Draft.Provider}"/>
+            </Grid>
+            <Grid x:Name="StatusRow" Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="8" IsVisible="False">
+                <Label x:Name="Lbl_Status" Grid.Column="0" Style="{StaticResource Draft.Notice}"/>
+                <Button x:Name="Btn_Retry" Grid.Column="1" Style="{StaticResource TrayKey}" IsVisible="False" Clicked="Retry_Clicked"/>
+            </Grid>
+            <Grid Grid.Row="2">
+                <Editor x:Name="Field" AutomationId="DictationDraft" Style="{StaticResource Draft.Editor}" TextChanged="Field_TextChanged"/>
+                <Border x:Name="LiveBox" Style="{StaticResource Draft.Live}" IsVisible="False">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="Live_Tapped"/>
+                    </Border.GestureRecognizers>
+                    <Label x:Name="Lbl_Live" Style="{StaticResource Draft.LiveText}"/>
+                </Border>
+            </Grid>
+            <Grid Grid.Row="3" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="6">
+                <Button x:Name="Btn_Discard" Grid.Column="0" Text="&#xE91D;" Style="{StaticResource TrayKey.Icon}" Clicked="Discard_Clicked"/>
+                <Button x:Name="Btn_Send" Grid.Column="2" Style="{StaticResource TrayKey}" Clicked="Send_Clicked"/>
+                <Button x:Name="Btn_SendEnter" Grid.Column="3" Style="{StaticResource TrayKey.Primary}" Clicked="SendEnter_Clicked"/>
+            </Grid>
+        </Grid>
+    </Border>
+</ContentView>

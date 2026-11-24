@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<!-- Page zoom is off; pinch and pan are handled in terminal.js. -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link rel="stylesheet" href="xterm.css">
+	<style>
+		@font-face {
+			font-family: "Geist Mono";
+			src: url("fonts/GeistMono-Regular.woff2") format("woff2");
+			font-weight: 400;
+		}
+
+		@font-face {
+			font-family: "Geist Mono";
+			src: url("fonts/GeistMono-Bold.woff2") format("woff2");
+			font-weight: 700;
+		}
+
+		@font-face {
+			font-family: "JetBrains Mono";
+			src: url("fonts/JetBrainsMono-Regular.woff2") format("woff2");
+			font-weight: 400;
+		}
+
+		@font-face {
+			font-family: "JetBrains Mono";
+			src: url("fonts/JetBrainsMono-Bold.woff2") format("woff2");
+			font-weight: 700;
+		}
+
+		@font-face {
+			font-family: "Remote Shell Symbols Mono";
+			src: url("fonts/RemoteShellSymbolsMono-Regular.woff2") format("woff2");
+		}
+
+		@font-face {
+			font-family: "Symbols Nerd Font Mono";
+			src: url("fonts/SymbolsNerdFontMono-Regular.ttf") format("truetype");
+		}
+
+		html, body {
+			margin: 0;
+			height: 100%;
+			overflow: hidden;
+			touch-action: none;
+			-webkit-user-select: none;
+			user-select: none;
+			-webkit-touch-callout: none;
+		}
+
+		/* The container fills the view and fit() sizes the grid to its content box, with an even inner gap on both sides and none on top. */
+		#terminal {
+			position: absolute;
+			inset: 0;
+			padding: 0 16px;
+		}
+
+		/* xterm.css paints the viewport black under the themed scrollable element, whose edge can show as a dark seam. */
+		#terminal .xterm-viewport {
+			background: none;
+		}
+
+		/* The width left over from whole cells is split evenly on both sides. */
+		#terminal .xterm-screen {
+			margin: 0 auto;
+		}
+	</style>
+</head>
+<body>
+	<div id="terminal"></div>
+	<script src="_framework/hybridwebview.js"></script>
+	<script src="terminal.js"></script>
+</body>
+</html>

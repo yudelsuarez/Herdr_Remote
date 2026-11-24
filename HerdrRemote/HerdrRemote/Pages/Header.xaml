@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:shapes="clr-namespace:Microsoft.Maui.Controls.Shapes;assembly=Microsoft.Maui.Controls" xmlns:pages="clr-namespace:HerdrRemote.Pages" x:Class="HerdrRemote.Pages.Header">
+    <!-- Shared header with title, optional subtitle, Accessory slot, and a 40x40 action with a status dot.
+         Only subtitle text truncates; its trailing status stays intact. BackVisible adds Back before the title.
+         A Lead view replaces the title and moves the subtitle below the full header in SubRow. -->
+    <Grid RowDefinitions="Auto,Auto">
+    <Grid x:Name="Chrome" Style="{StaticResource Hdr}">
+        <Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="Auto,*">
+            <Button x:Name="Btn_Back" Grid.Column="0" Text="&#xE908;" Style="{StaticResource Hdr.Back}" IsVisible="False" Clicked="Back_Clicked"/>
+            <VerticalStackLayout x:Name="TitleColumn" Grid.Column="1" VerticalOptions="Center" SizeChanged="TitleColumn_SizeChanged">
+                <Label x:Name="Lbl_Title" Style="{StaticResource Hdr.Title}"/>
+                <HorizontalStackLayout x:Name="SubLine" Style="{StaticResource Hdr.SubLine}" IsVisible="False">
+                    <Label x:Name="Lbl_Sub" Style="{StaticResource Hdr.Sub}"/>
+                    <Label x:Name="Lbl_SubStatus" Style="{StaticResource Hdr.SubStatus}" IsVisible="False"/>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+            <ContentView x:Name="LeadSlot" Grid.Column="1" VerticalOptions="Center" IsVisible="False" SizeChanged="LeadSlot_SizeChanged"/>
+        </Grid>
+        <ContentView x:Name="SubRow" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" IsVisible="False" SizeChanged="TitleColumn_SizeChanged"/>
+        <ContentView x:Name="AccessorySlot" Grid.Column="1" VerticalOptions="Center"/>
+        <Grid x:Name="Action" Grid.Column="2" Style="{StaticResource Hdr.Button}" IsVisible="False">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="Action_Tapped"/>
+            </Grid.GestureRecognizers>
+            <Label x:Name="Lbl_Action" Style="{StaticResource Hdr.Icon}"/>
+            <shapes:Ellipse x:Name="Dot" Style="{StaticResource Hdr.Dot}" IsVisible="False"/>
+        </Grid>
+    </Grid>
+    <pages:ReadingBar x:Name="Reading" Grid.Row="1"/>
+    </Grid>
+</ContentView>

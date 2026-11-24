@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="Popups.ListSheet">
+    <!-- Folder mode lists folders in use and Browse; browsing adds a back button, path, loading/error/empty note,
+         parent and child folders, and Open here. Reuse ListPicker's virtualized list, capped at MaxRows and refitted on reload.
+         Provider filtering replaces Cancel with a count and shows a filter field, matching rows or an empty-result note. -->
+    <VerticalStackLayout>
+        <Grid Style="{StaticResource List.Head}">
+            <Button x:Name="Btn_Back" Grid.Column="0" Style="{StaticResource List.Back}" Text="&#xE908;" IsVisible="False" Clicked="Back_Clicked"/>
+            <Label x:Name="Lbl_Title" Grid.Column="1" Style="{StaticResource Sht.Title}"/>
+            <Button x:Name="Btn_Cancel" Grid.Column="2" Style="{StaticResource Sht.Action}" Clicked="Cancel_Clicked"/>
+            <Label x:Name="Lbl_Count" Grid.Column="2" Style="{StaticResource List.Count}" IsVisible="False"/>
+        </Grid>
+        <Label x:Name="Lbl_Path" Style="{StaticResource List.Path}" IsVisible="False"/>
+        <Label x:Name="Lbl_Section" Style="{StaticResource List.Section}"/>
+        <Border x:Name="FilterField" Style="{StaticResource List.Field}" IsVisible="False">
+            <Entry x:Name="FilterEntry" Style="{StaticResource Fld.Entry}" TextChanged="Filter_TextChanged"/>
+        </Border>
+        <Label x:Name="Lbl_Note" Style="{StaticResource List.Note}" IsVisible="False"/>
+        <!-- A pick is the whole row: SelectionChanged takes the picked Item. -->
+        <CollectionView x:Name="Items" Style="{StaticResource Lst.Options}" ItemTemplate="{StaticResource List.ItemTemplate}" SelectionMode="Single" SelectionChanged="Item_SelectionChanged"/>
+        <BoxView x:Name="Divider" Style="{StaticResource List.Divider}"/>
+        <Grid x:Name="BrowseRow" Style="{StaticResource Lst.Row}">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="Browse_Tapped"/>
+            </Grid.GestureRecognizers>
+            <Label Grid.Column="0" Style="{StaticResource Lst.Glyph}" Text="&#xE906;"/>
+            <Label x:Name="Lbl_Browse" Grid.Column="1" Style="{StaticResource List.ItemTitle}"/>
+            <Label Grid.Column="2" Style="{StaticResource List.Trail}" Text="~"/>
+        </Grid>
+        <Button x:Name="Btn_Open" Style="{StaticResource List.Foot}" IsVisible="False" Clicked="Open_Clicked"/>
+    </VerticalStackLayout>
+</ContentView>

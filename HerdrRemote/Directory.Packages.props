@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <!-- Stops MSBuild from inheriting package settings from parent directories.
+         The app declares package versions in its project file. -->
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+</Project>

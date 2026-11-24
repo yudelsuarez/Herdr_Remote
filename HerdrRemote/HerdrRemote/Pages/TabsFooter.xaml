@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="HerdrRemote.Pages.TabsFooter">
+    <!-- Bottom tabs below a divider: Herdr, Reader, Settings. This ContentView occupies its host's bottom Auto row.
+         Active selects the highlighted tab; named elements are used by code-behind. -->
+    <VerticalStackLayout>
+        <BoxView Style="{StaticResource Lst.Divider}"/>
+        <Grid Style="{StaticResource TabBar}">
+            <VerticalStackLayout x:Name="TabHerdr" Grid.Column="0" Style="{StaticResource Tab.Item}">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TabHerdr_Tapped"/>
+                </VerticalStackLayout.GestureRecognizers>
+                <Label x:Name="IconHerdr" Style="{StaticResource Tab.Icon}" Text="&#xE94E;"/>
+                <Label x:Name="LabelHerdr" Style="{StaticResource Tab.Text}"/>
+            </VerticalStackLayout>
+            <VerticalStackLayout x:Name="TabReader" Grid.Column="1" Style="{StaticResource Tab.Item}">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TabReader_Tapped"/>
+                </VerticalStackLayout.GestureRecognizers>
+                <Label x:Name="IconReader" Style="{StaticResource Tab.Icon}" Text="&#xE90D;"/>
+                <Label x:Name="LabelReader" Style="{StaticResource Tab.Text}"/>
+            </VerticalStackLayout>
+            <VerticalStackLayout x:Name="TabVoices" Grid.Column="2" Style="{StaticResource Tab.Item}">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TabVoices_Tapped"/>
+                </VerticalStackLayout.GestureRecognizers>
+                <Label x:Name="IconVoices" Style="{StaticResource Tab.Icon}" Text="&#xE94F;"/>
+                <Label x:Name="LabelVoices" Style="{StaticResource Tab.Text}"/>
+            </VerticalStackLayout>
+        </Grid>
+    </VerticalStackLayout>
+</ContentView>

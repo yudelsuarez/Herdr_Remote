@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:pages="clr-namespace:HerdrRemote.Pages" x:Class="HerdrRemote.Pages.InfoList">
+    <!-- Shared list card for Settings, provider sections, and Connection. Each row has a glyph, title, optional
+         monospace subtitle, value, and a chevron when it opens another view. Dividers span every row except the first. -->
+    <Border Style="{StaticResource Lst}">
+        <VerticalStackLayout x:Name="Stack">
+            <BindableLayout.ItemTemplate>
+                <DataTemplate x:DataType="pages:InfoRow">
+                    <VerticalStackLayout>
+                        <BoxView Style="{StaticResource Lst.Divider}" IsVisible="{Binding Divider}"/>
+                        <Grid Style="{Binding RowStyle}" SizeChanged="Row_SizeChanged" BindingContextChanged="Row_Rebound">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="Row_Tapped"/>
+                            </Grid.GestureRecognizers>
+                            <Label Grid.Column="0" Style="{StaticResource Lst.Glyph}" Text="{Binding Glyph}"/>
+                            <VerticalStackLayout x:Name="Title_Stack" Grid.Column="1" VerticalOptions="Center">
+                                <Label Style="{StaticResource Lst.Title}" Text="{Binding Title}"/>
+                                <Label Style="{StaticResource Lst.Sub}" Text="{Binding Sub}" IsVisible="{Binding HasSub}"/>
+                            </VerticalStackLayout>
+                            <HorizontalStackLayout x:Name="Value_Stack" Grid.Column="2" Style="{StaticResource Row.Gap4}" VerticalOptions="Center">
+                                <Label x:Name="Lbl_Value" Style="{Binding ValueStyle}" Text="{Binding Value}" IsVisible="{Binding HasValue}"/>
+                                <Label Style="{StaticResource Lst.Chev}" Text="&#xE907;" IsVisible="{Binding Chevron}"/>
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </DataTemplate>
+            </BindableLayout.ItemTemplate>
+        </VerticalStackLayout>
+    </Border>
+</ContentView>

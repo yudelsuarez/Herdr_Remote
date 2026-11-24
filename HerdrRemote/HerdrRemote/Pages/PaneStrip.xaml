@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:shapes="clr-namespace:Microsoft.Maui.Controls.Shapes;assembly=Microsoft.Maui.Controls" x:Class="HerdrRemote.Pages.PaneStrip">
+    <!-- Pane pill with status dot, name, position "i/n" in its space, and chevron. For multi-pane tabs,
+         a miniature layout with the current pane filled replaces the position. Tapping opens the pane sheet
+         (or menu outside a space); swiping moves between panes. Show supplies its content. -->
+    <Border x:Name="Pill" Style="{StaticResource Pill}">
+        <Border.GestureRecognizers>
+            <TapGestureRecognizer Tapped="Pill_Tapped"/>
+            <SwipeGestureRecognizer Direction="Left" Swiped="Pill_Swiped"/>
+            <SwipeGestureRecognizer Direction="Right" Swiped="Pill_Swiped"/>
+        </Border.GestureRecognizers>
+        <HorizontalStackLayout x:Name="PillRow" Style="{StaticResource Pill.Row}">
+            <shapes:Ellipse x:Name="Dot" Style="{StaticResource Pill.Dot}"/>
+            <Label x:Name="Lbl_Name" Style="{StaticResource Pill.Name}"/>
+            <Label x:Name="Lbl_Count" Style="{StaticResource Pill.Count}"/>
+            <ContentView x:Name="MapSlot" VerticalOptions="Center" IsVisible="False"/>
+            <Label x:Name="Lbl_Chev" Style="{StaticResource Pill.Chev}" Text="&#xE909;"/>
+        </HorizontalStackLayout>
+    </Border>
+</ContentView>

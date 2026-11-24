@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<pages:Tray xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:pages="clr-namespace:HerdrRemote.Pages" x:Class="HerdrRemote.Pages.KeyBar">
+    <!-- Single-row terminal key bar preserves terminal space: horizontally scrolling Keys, then fixed End icons
+         (jump to bottom while scrolled back, dictation, keyboard, Attach). Back and the pane pill stay in the header.
+         TrayKey uses Geist Mono to match terminal rows. Like Moshi, Termux, and Termius, it has no paste or image key;
+         long-pressing the terminal offers Paste. Keys fill the space to the divider and scroll under its edge, with no empty band.
+         Shortcuts supplies saved key order; built-in handlers retain their behavior. Locked modifiers show a lock line.
+         ApplyLanguage sets accessibility descriptions. -->
+    <pages:Tray.Keys>
+        <Grid x:Name="KeysArea">
+            <ScrollView x:Name="KeysScroll" Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                <HorizontalStackLayout x:Name="KeyRow" Spacing="4"/>
+            </ScrollView>
+        </Grid>
+    </pages:Tray.Keys>
+    <pages:Tray.End>
+        <HorizontalStackLayout Style="{StaticResource Row.Gap6}">
+            <Button x:Name="Btn_Bottom" Text="&#xE954;" Style="{StaticResource TrayKey.IconAcc}" IsVisible="False" Clicked="Bottom_Clicked"/>
+            <Button x:Name="Btn_Mic" Text="&#xE972;" Style="{StaticResource TrayKey.Icon}" Clicked="Mic_Clicked"/>
+            <Button x:Name="Btn_Keyboard" Text="&#xE92F;" Style="{StaticResource TrayKey.Icon}" Clicked="Keyboard_Clicked"/>
+            <Button x:Name="Btn_Attach" Text="&#xE92C;" Style="{StaticResource TrayKey.Icon}" Clicked="Attach_Clicked"/>
+        </HorizontalStackLayout>
+    </pages:Tray.End>
+</pages:Tray>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:lang="clr-namespace:Languages" xmlns:pages="clr-namespace:HerdrRemote.Pages" x:Class="HerdrRemote.Pages.Connection" Title="Connection" Style="{StaticResource Page}">
+    <!-- Connection form on the current tab: Mac name, connection card in page mode, address and port, user, and a hidden
+         password with a visibility toggle. The rows copy this phone's key or forget the pinned host key.
+         The header provides Back; the tray provides Save and connect. Labels are set in code. -->
+    <Grid RowDefinitions="Auto,*,Auto">
+        <pages:Header x:Name="Header" Grid.Row="0" BackVisible="True" BackTapped="Back_Clicked"/>
+        <ScrollView x:Name="Scroll" Grid.Row="1">
+            <VerticalStackLayout>
+                <pages:ConnectionCard x:Name="Card" Margin="{StaticResource Gutter}" PageMode="True" ActionTapped="Card_ActionTapped"/>
+                <VerticalStackLayout Style="{StaticResource Form}" Margin="{StaticResource Gutter}">
+                    <Grid Style="{StaticResource Form.HostPort}">
+                        <VerticalStackLayout Grid.Column="0">
+                            <Label x:Name="Lbl_Host" Style="{StaticResource Fld.Label}"/>
+                            <Border Style="{StaticResource Fld}">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding Source={x:Reference En_Host}, Path=IsFocused, x:DataType=Entry}" Value="True">
+                                        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <Entry x:Name="En_Host" Style="{StaticResource Fld.Entry}" Keyboard="Url" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False"/>
+                            </Border>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1">
+                            <Label x:Name="Lbl_Port" Style="{StaticResource Fld.Label}"/>
+                            <Border Style="{StaticResource Fld}">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding Source={x:Reference En_Port}, Path=IsFocused, x:DataType=Entry}" Value="True">
+                                        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <Entry x:Name="En_Port" Style="{StaticResource Fld.Entry}" Keyboard="Numeric"/>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Grid>
+                    <VerticalStackLayout>
+                        <Label x:Name="Lbl_User" Style="{StaticResource Fld.Label}"/>
+                        <Border Style="{StaticResource Fld}">
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding Source={x:Reference En_User}, Path=IsFocused, x:DataType=Entry}" Value="True">
+                                    <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Entry x:Name="En_User" Style="{StaticResource Fld.Entry}" Keyboard="Email" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False"/>
+                        </Border>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout>
+                        <Label Style="{StaticResource Fld.Label}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span x:Name="Span_Password"/>
+                                    <Span x:Name="Span_PasswordNote" Style="{StaticResource Fld.LabelSuffixSpan}"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Border Style="{StaticResource Fld}">
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding Source={x:Reference En_Password}, Path=IsFocused, x:DataType=Entry}" Value="True">
+                                    <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Entry x:Name="En_Password" Grid.Column="0" Style="{StaticResource Fld.Entry}" IsPassword="True" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False"/>
+                                <Label x:Name="Eye_Password" Grid.Column="1" Style="{StaticResource Fld.Eye}"/>
+                            </Grid>
+                        </Border>
+                        <Label x:Name="Lbl_PasswordHint" Style="{StaticResource Fld.Hint}"/>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+                <pages:InfoList x:Name="Rows" Tapped="Rows_Tapped"/>
+            </VerticalStackLayout>
+        </ScrollView>
+        <pages:Tray Grid.Row="2">
+            <pages:Tray.End>
+                <Button x:Name="Btn_Save" Style="{StaticResource TrayKey.Primary}" Clicked="Btn_Save_Clicked"/>
+            </pages:Tray.End>
+        </pages:Tray>
+        <pages:IsBusyBox x:Name="IsBusyBox" Grid.Row="0" Grid.RowSpan="3" IsVisible="False" BoxTitle="{lang:i18n Key='Loading'}" BoxBody="{lang:i18n Key='Please wait.'}"/>
+    </Grid>
+</ContentPage>

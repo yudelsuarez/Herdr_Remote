@@ -1,0 +1,85 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net10.0-android</TargetFrameworks>
+		<TargetFrameworks Condition="!$([MSBuild]::IsOSPlatform('linux'))">$(TargetFrameworks);net10.0-ios</TargetFrameworks>
+
+		<OutputType>Exe</OutputType>
+		<RootNamespace>HerdrRemote</RootNamespace>
+		<UseMaui>true</UseMaui>
+		<MauiVersion>10.0.120</MauiVersion>
+		<SingleProject>true</SingleProject>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<!-- Treat compiler and MSBuild warnings as errors, including banned API use (RS0030). -->
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<MSBuildTreatWarningsAsErrors>true</MSBuildTreatWarningsAsErrors>
+		<!-- Without strict mode, XamlC exempts XC0022, XC0023, and XC0025 from warnings-as-errors. -->
+		<MauiStrictXamlCompilation>true</MauiStrictXamlCompilation>
+		<MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
+
+		<!-- Generate C# from XAML at build time for faster builds and runtime performance.
+		     Remove this setting to use the default. For a single page, set Inflator to Default
+		     (Runtime in Debug, XamlC in Release) or force Runtime. -->
+		<MauiXamlInflator>SourceGen</MauiXamlInflator>
+
+		<ApplicationTitle>Remote Shell</ApplicationTitle>
+
+		<ApplicationId>com.yudelsuarez.remoteshell</ApplicationId>
+
+		<ApplicationDisplayVersion>1.0.0</ApplicationDisplayVersion>
+		<ApplicationVersion>1</ApplicationVersion>
+
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">16.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">33.0</SupportedOSPlatformVersion>
+	</PropertyGroup>
+
+	<!-- Android Debug uses compiled code because the generated style initializer exceeds the Mono interpreter's local variable limit. -->
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug' And $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<UseInterpreter>false</UseInterpreter>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)'=='net10.0-ios' and '$(Configuration)'=='Debug'">
+		<ProvisioningType>manual</ProvisioningType>
+		<CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<MauiIcon Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" ForegroundScale="0.88" Color="#0A0F1A" />
+		<MauiIcon Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != 'android'" Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" ForegroundScale="1.15" Color="#0A0F1A" />
+
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#0A0F1A" BaseSize="208,208" />
+
+		<MauiImage Include="Resources\Images\*" />
+
+		<MauiFont Include="Resources\Fonts\*" />
+
+		<!-- Package raw assets without the Resources\Raw prefix. -->
+		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Languages\es-US_Español.txt" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Languages\es-US_Español.txt" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Add framework APIs here only when they are proven unsafe for this app. -->
+		<AdditionalFiles Include="BannedSymbols.txt" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion).1" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+		<PackageReference Include="SSH.NET" Version="2026.0.0" />
+		<PackageReference Include="BouncyCastle.Cryptography" Version="2.7.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="5.6.0" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
+	</ItemGroup>
+
+
+	<!-- Personal signing identity (CodesignKey, CodesignProvision) lives in Signing.local.props, which is not in the repository. -->
+	<Import Project="Signing.local.props" Condition="Exists('Signing.local.props')" />
+</Project>

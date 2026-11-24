@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:pages="clr-namespace:HerdrRemote.Pages" x:Class="HerdrRemote.Pages.Voices" Title="Settings" Style="{StaticResource Page}">
+    <!-- Settings cards for Connection, Appearance, Language, Voice, and About.
+         Providers and API keys have a separate page. SetLanguage supplies labels. -->
+    <Grid RowDefinitions="Auto,*,Auto">
+        <pages:Header x:Name="Header" Grid.Row="0"/>
+        <ScrollView x:Name="Scroll" Grid.Row="1">
+            <VerticalStackLayout>
+                <Grid Style="{StaticResource Sec}">
+                    <Label x:Name="Lbl_Connection" Style="{StaticResource Sec.Title}"/>
+                </Grid>
+                <pages:InfoList x:Name="ConnectionRow" Tapped="ConnectionRow_Tapped"/>
+                <Grid Style="{StaticResource Sec}">
+                    <Label x:Name="Lbl_Appearance" Style="{StaticResource Sec.Title}"/>
+                </Grid>
+                <Border Style="{StaticResource Seg}" Margin="{StaticResource Gutter}">
+                    <Grid ColumnDefinitions="*,*,*">
+                        <RadioButton x:Name="Rb_ThemeLight" Grid.Column="0" GroupName="Appearance" Value="Light" Style="{StaticResource Seg.Radio}" CheckedChanged="Appearance_CheckedChanged"/>
+                        <RadioButton x:Name="Rb_ThemeSystem" Grid.Column="1" GroupName="Appearance" Value="System" Style="{StaticResource Seg.Radio}" CheckedChanged="Appearance_CheckedChanged"/>
+                        <RadioButton x:Name="Rb_ThemeDark" Grid.Column="2" GroupName="Appearance" Value="Dark" Style="{StaticResource Seg.Radio}" CheckedChanged="Appearance_CheckedChanged"/>
+                    </Grid>
+                </Border>
+                <Grid Style="{StaticResource Sec.Spacer}"/>
+                <pages:InfoList x:Name="LanguageRow" Tapped="LanguageRow_Tapped"/>
+                <Grid Style="{StaticResource Sec}">
+                    <Label x:Name="Lbl_Keys" Style="{StaticResource Sec.Title}"/>
+                </Grid>
+                <pages:InfoList x:Name="KeysRow" Tapped="KeysRow_Tapped"/>
+                <Grid Style="{StaticResource Sec}">
+                    <Label x:Name="Lbl_Voice" Style="{StaticResource Sec.Title}"/>
+                </Grid>
+                <pages:InfoList x:Name="VoiceRows" Tapped="VoiceRows_Tapped"/>
+                <Grid Style="{StaticResource Sec}">
+                    <Label x:Name="Lbl_About" Style="{StaticResource Sec.Title}"/>
+                </Grid>
+                <pages:InfoList x:Name="AboutRows"/>
+            </VerticalStackLayout>
+        </ScrollView>
+        <pages:TabsFooter x:Name="Tabs" Grid.Row="2"/>
+        <pages:IsBusyBox x:Name="IsBusyBox" Grid.Row="0" Grid.RowSpan="3" IsVisible="False"/>
+    </Grid>
+</ContentPage>

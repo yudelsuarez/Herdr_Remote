@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="HerdrRemote.Pages.IsBusyBox">
+    <!-- Modal scrim and card with title, spinner, and body. Place it in the page's root Grid, spanning all rows and initially hidden. -->
+    <Grid Style="{StaticResource Scrim}">
+        <!-- Consume taps so Android cannot pass them through to controls that could navigate away during a save. -->
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer/>
+        </Grid.GestureRecognizers>
+        <Grid Style="{StaticResource Wait.Frame}">
+        <Border Style="{StaticResource Dlg.Shadow}"/>
+        <Border Style="{StaticResource Busy}">
+            <VerticalStackLayout Style="{StaticResource Wait.Stack}">
+                <Label x:Name="BusyTitle" Style="{StaticResource Dlg.Title}" HorizontalTextAlignment="Center"/>
+                <ActivityIndicator IsRunning="True" Style="{StaticResource Busy.Spinner}"/>
+                <Label x:Name="BusyBody" Style="{StaticResource Dlg.Body}" HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+        </Border>
+        </Grid>
+    </Grid>
+</ContentView>

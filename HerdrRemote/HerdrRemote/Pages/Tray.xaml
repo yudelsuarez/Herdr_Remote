@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Border xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="HerdrRemote.Pages.Tray" Style="{StaticResource Tray}" SizeChanged="Tray_SizeChanged">
+    <!-- Shared single-row tray: Start, Keys, and End, with the primary action last. Arrange lays out the slots. -->
+    <Grid x:Name="Rows" Style="{StaticResource Tray.Grid}" ColumnDefinitions="Auto,Auto,*,Auto,Auto" RowDefinitions="Auto">
+        <HorizontalStackLayout x:Name="StartSlot" Grid.Column="0" Style="{StaticResource Row.Gap6}"/>
+        <BoxView x:Name="StartSep" Grid.Column="1" Style="{StaticResource Tray.Sep}"/>
+        <ContentView x:Name="KeysSlot" Grid.Column="2"/>
+        <BoxView x:Name="EndSep" Grid.Column="3" Style="{StaticResource Tray.Sep}"/>
+        <HorizontalStackLayout x:Name="EndSlot" Grid.Column="4" Style="{StaticResource Row.Gap6}"/>
+    </Grid>
+</Border>

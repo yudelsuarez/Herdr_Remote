@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:pages="clr-namespace:HerdrRemote.Pages" x:Class="HerdrRemote.Pages.Pane" Title="Pane" Style="{StaticResource Page}">
+    <!-- Terminal page with a header, retained terminal cell and floating notices, pinch badge, hidden keyboard field,
+         and a single-row key bar in its own row so terminal rows are never covered. Pane.ApplyLayout hides the header
+         only while typing in landscape. Icons use the app font; labels are set in code. Column 0 holds the wide sidebar. -->
+    <!-- Root: the image viewer is laid over all of it while open (Pane.Screen_ImageTapped). -->
+    <Grid x:Name="Root" RowDefinitions="Auto,*,Auto" ColumnDefinitions="Auto,*" RowSpacing="0" ColumnSpacing="0">
+        <!-- Sidebar for windows at least 600 by 600: Herdr header with Mac action and status dot, fixed Spaces rows,
+             scrolling Agents rows, and a bottom tab bar. Herdr returns to the list; a divider marks the right edge. -->
+        <Grid x:Name="Side" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Style="{StaticResource Side}" IsVisible="False">
+            <pages:Header x:Name="SideHeader" Grid.Row="0" ActionGlyph="&#xE930;" ActionTapped="Header_ActionTapped"/>
+            <ScrollView x:Name="SideScroll" Grid.Row="2"/>
+            <pages:TabsFooter x:Name="SideTabs" Grid.Row="3"/>
+            <BoxView Grid.Row="0" Grid.RowSpan="4" Style="{StaticResource Side.Line}"/>
+        </Grid>
+        <pages:Header x:Name="Header" Grid.Row="0" Grid.Column="1" BackTapped="Header_BackTapped" ActionTapped="Header_ActionTapped">
+            <!-- Pane pill replaces the title after Back. The new-menu "+" hides for terminals outside a space. -->
+            <pages:Header.Lead>
+                <Grid Style="{StaticResource Hdr.Lead}">
+                    <pages:PaneStrip x:Name="Strip" Grid.Column="0" HorizontalOptions="Fill"/>
+                    <Grid x:Name="NewKey" Grid.Column="1" Style="{StaticResource Hdr.Button}" IsVisible="False">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="NewKey_Tapped"/>
+                        </Grid.GestureRecognizers>
+                        <Label Style="{StaticResource Hdr.IconAcc}" Text="&#xE902;" AutomationProperties.IsInAccessibleTree="False"/>
+                    </Grid>
+                </Grid>
+            </pages:Header.Lead>
+            <!-- One-tap light/dark switch beside the Mac action, using the same 40x40 target. -->
+            <pages:Header.Accessory>
+                <Grid x:Name="ThemeKey" Style="{StaticResource Hdr.Button}">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="ThemeKey_Tapped"/>
+                    </Grid.GestureRecognizers>
+                    <Label x:Name="Lbl_Theme" Style="{StaticResource Hdr.Icon}"/>
+                </Grid>
+            </pages:Header.Accessory>
+        </pages:Header>
+        <!-- The terminal and its overlays. -->
+        <Grid x:Name="TerminalLayer" Grid.Row="1" Grid.Column="1" RowSpacing="0" ColumnSpacing="0">
+            <!-- The key-bar button owns input focus; the terminal above this view owns touches. -->
+            <pages:TerminalKeys x:Name="Input" AutomationId="TerminalInput" Opacity="0" WidthRequest="40" HeightRequest="40"
+                   HorizontalOptions="Start" VerticalOptions="Start"/>
+            <pages:TerminalHost x:Name="TerminalHost" ZIndex="1">
+                <pages:TerminalView x:Name="Screen"/>
+            </pages:TerminalHost>
+            <!-- Only visible content takes input; arrangement bounds the viewport to the terminal cell. -->
+            <pages:PaneOverlayScroll x:Name="OverlayScroll" ZIndex="2" VerticalOptions="Start" HorizontalOptions="Fill" Orientation="Vertical" Padding="0" Margin="0"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Bg}, Dark={StaticResource BgDark}}">
+                <Grid x:Name="OverlayRows" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="0" ColumnSpacing="0" Padding="0">
+                    <Border x:Name="LinkStrip" Grid.Row="0" Style="{StaticResource LinkStrip}" IsVisible="False">
+                        <HorizontalStackLayout Style="{StaticResource Row.Gap8}" HorizontalOptions="Center">
+                            <Label x:Name="Lbl_LinkGlyph" Style="{StaticResource LinkStrip.Glyph}" Text="&#xE912;"/>
+                            <Label x:Name="Lbl_LinkWord" Style="{StaticResource LinkStrip.Text}" MaxLines="1"/>
+                        </HorizontalStackLayout>
+                    </Border>
+                    <!-- Header's original Reading view is placed in row 1 once by the constructor. -->
+                    <pages:FindBar x:Name="Finder" Grid.Row="2" IsVisible="False" BackgroundColor="{AppThemeBinding Light={StaticResource Bg}, Dark={StaticResource BgDark}}"/>
+                    <Grid x:Name="NoticeSlot" Grid.Row="3"/>
+                    <!-- Dictation draft with Send and Send and Enter actions (PaneDictation). -->
+                    <pages:DictationDraft x:Name="Draft" Grid.Row="4" IsVisible="False"/>
+                </Grid>
+            </pages:PaneOverlayScroll>
+            <!-- The floating D-pad (the key bar's D-pad key opens and closes it): over the terminal, never resizing it. -->
+            <pages:DPad x:Name="Pad" ZIndex="3" IsVisible="False"/>
+            <!-- The font size while a pinch changes it ("11 pt"); hidden when the fingers lift. -->
+            <Border x:Name="Badge" ZIndex="4" IsVisible="False" InputTransparent="True" Style="{StaticResource Badge}">
+                <Label x:Name="Lbl_Badge" Style="{StaticResource Badge.Text}"/>
+            </Border>
+        </Grid>
+        <pages:KeyBar x:Name="Bar" Grid.Row="2" Grid.Column="1"/>
+    </Grid>
+</ContentPage>

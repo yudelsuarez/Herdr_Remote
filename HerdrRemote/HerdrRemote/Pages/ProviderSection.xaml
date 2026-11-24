@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:pages="clr-namespace:HerdrRemote.Pages" x:Class="HerdrRemote.Pages.ProviderSection">
+    <!-- Provider section with label, cloud API key field, and settings rows in a list card.
+         RefreshAsync sets labels. -->
+    <VerticalStackLayout>
+        <Grid Style="{StaticResource Sec}">
+            <Label x:Name="Lbl_Title" Style="{StaticResource Lst.Title}"/>
+        </Grid>
+        <VerticalStackLayout Style="{StaticResource Form}">
+            <VerticalStackLayout x:Name="KeyGroup" Style="{StaticResource Form}" Margin="{StaticResource Gutter}" IsVisible="False">
+                <VerticalStackLayout>
+                    <Label x:Name="Lbl_KeyLabel" Style="{StaticResource Fld.Label}"/>
+                    <Border Style="{StaticResource Fld}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding Source={x:Reference En_Key}, Path=IsFocused, x:DataType=Entry}" Value="True">
+                                <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Entry x:Name="En_Key" Grid.Column="0" Style="{StaticResource Fld.Entry}" IsPassword="True" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False"/>
+                            <Label x:Name="Eye_Key" Grid.Column="1" Style="{StaticResource Fld.Eye}"/>
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+                <Button x:Name="Btn_SaveKey" Style="{StaticResource Btn.Outline}" Clicked="Btn_SaveKey_Clicked"/>
+            </VerticalStackLayout>
+            <pages:InfoList x:Name="Rows" Tapped="Rows_Tapped"/>
+            <Button x:Name="Btn_RefreshModels" Style="{StaticResource Btn.Outline}" Margin="{StaticResource Gutter}" IsVisible="False" Clicked="Rows_Tapped"/>
+        </VerticalStackLayout>
+    </VerticalStackLayout>
+</ContentView>

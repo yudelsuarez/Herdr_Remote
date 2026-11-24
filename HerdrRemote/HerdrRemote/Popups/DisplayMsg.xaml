@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="Popups.DisplayMsg">
+    <!-- Buttons[0] is the affirmative action: ButtonLeft uses Btn.Primary; secondary actions use Btn.Text. -->
+    <Grid x:Name="GridHolePage" Style="{StaticResource Dlg.Grid}">
+        <!-- Keep the dismissal target behind the card so taps inside it never dismiss the popup. -->
+        <Grid HorizontalOptions="Fill" VerticalOptions="Fill">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="TouchOut_Tapped"/>
+            </Grid.GestureRecognizers>
+        </Grid>
+        <Grid Style="{StaticResource Dlg.Frame}">
+        <Border Style="{StaticResource Dlg.Shadow}"/>
+        <Border x:Name="BorderLoginContent" HorizontalOptions="Fill" Style="{StaticResource Dlg}" VerticalOptions="Center">
+            <Grid x:Name="GridLoginContent" RowDefinitions="Auto,Auto,Auto">
+                <Border x:Name="Header_Card" Grid.Row="0" Style="{StaticResource Dlg.Head}">
+                    <Grid Style="{StaticResource Dlg.HeadGrid}">
+                        <Label x:Name="Header_CenterTitle" Style="{StaticResource Dlg.Title}" Text=""/>
+                    </Grid>
+                </Border>
+                <ScrollView Grid.Row="1" Style="{StaticResource Dlg.Scroll}">
+                    <Label x:Name="LblMessage" Style="{StaticResource Dlg.Body}"/>
+                </ScrollView>
+                <Grid Grid.Row="2" RowDefinitions="Auto,Auto,Auto" Style="{StaticResource Dlg.Foot}">
+                        <Button x:Name="ButtonLeft" Grid.Row="0" Clicked="ButtonLeft_Clicked" Style="{StaticResource Btn.Primary}" Text="">
+                            <Button.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Reference ButtonLeft}, Path=Text.Length, x:DataType=Button}" TargetType="Button" Value="0">
+                                    <Setter Property="IsVisible" Value="False"/>
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+                        <Button x:Name="ButtonRight" Grid.Row="1" Clicked="ButtonRight_Clicked" Style="{StaticResource Btn.Text}" Text="">
+                            <Button.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Reference ButtonRight}, Path=Text.Length, x:DataType=Button}" TargetType="Button" Value="0">
+                                    <Setter Property="IsVisible" Value="False"/>
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+                        <Button x:Name="ButtonThird" Grid.Row="2" Clicked="ButtonThird_Clicked" Style="{StaticResource Btn.Text}" Text="">
+                            <Button.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Reference ButtonThird}, Path=Text.Length, x:DataType=Button}" TargetType="Button" Value="0">
+                                    <Setter Property="IsVisible" Value="False"/>
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+                </Grid>
+            </Grid>
+        </Border>
+        </Grid>
+    </Grid>
+</ContentView>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:pages="clr-namespace:HerdrRemote.Pages" xmlns:remote="clr-namespace:HerdrRemote.Remote" x:Class="HerdrRemote.Pages.ShortcutsPage" Title="Shortcuts" Style="{StaticResource Page}">
+    <Grid RowDefinitions="Auto,*">
+        <pages:Header x:Name="Header" BackVisible="True" BackTapped="Back_Clicked"/>
+        <CollectionView x:Name="Items" Grid.Row="1" SelectionMode="None" CanReorderItems="True" ReorderCompleted="Items_ReorderCompleted">
+            <CollectionView.Header>
+                <VerticalStackLayout>
+                    <Grid Style="{StaticResource Sec}"><Label x:Name="Lbl_Corners" Style="{StaticResource Sec.Title}"/></Grid>
+                    <Border Style="{StaticResource Lst}">
+                        <Grid x:Name="Preview" ColumnDefinitions="34,34,34" RowDefinitions="34,34,34" ColumnSpacing="5" RowSpacing="5" Padding="0,10" HorizontalOptions="Center" InputTransparent="True"/>
+                    </Border>
+                    <pages:InfoList x:Name="Corners" Tapped="Corners_Tapped"/>
+                    <Grid Style="{StaticResource Sec}"><Label x:Name="Lbl_Bar" Style="{StaticResource Sec.Title}"/></Grid>
+                </VerticalStackLayout>
+            </CollectionView.Header>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="remote:KeyBarEntry">
+                    <Border Style="{StaticResource Lst}" Margin="16,0" StrokeThickness="0">
+                    <Border.StrokeShape><RoundRectangle/></Border.StrokeShape>
+                    <Grid BindingContextChanged="Row_Bound" HandlerChanged="Row_Bound" Loaded="Row_Bound">
+                        <Grid Style="{StaticResource Lst.RowSub}" ColumnDefinitions="Auto,*,24" InputTransparent="False">
+                            <Grid.GestureRecognizers><TapGestureRecognizer Tapped="Row_Tapped"/></Grid.GestureRecognizers>
+                            <Button x:Name="Keycap" Text="{Binding Label}" Style="{StaticResource TrayKey}" VerticalOptions="Center" InputTransparent="True" AutomationProperties.IsInAccessibleTree="False"/>
+                            <Label x:Name="Summary" Grid.Column="1" Style="{StaticResource Lst.Sub}" VerticalOptions="Center" AutomationProperties.IsInAccessibleTree="False"/>
+                            <Label Grid.Column="2" Text="&#xE96D;" Style="{StaticResource Lst.Glyph}" TextColor="{AppThemeBinding Light={StaticResource Ink3}, Dark={StaticResource Ink3Dark}}" AutomationProperties.IsInAccessibleTree="False"/>
+                        </Grid>
+                        <BoxView Style="{StaticResource Lst.Divider}" VerticalOptions="End"/>
+                    </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.Footer>
+                <VerticalStackLayout Spacing="12" Padding="0,0,0,16">
+                    <Border x:Name="AddCard" Style="{StaticResource Lst}" Margin="16,0">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="0,0,12,12"/></Border.StrokeShape>
+                        <Button x:Name="Btn_Add" Style="{StaticResource Btn.Text}" HorizontalOptions="Fill" MinimumHeightRequest="50" Clicked="Add_Clicked"/>
+                    </Border>
+                    <Button x:Name="Btn_Reset" Style="{StaticResource Btn.Outline}" Margin="{StaticResource Gutter}" MinimumHeightRequest="50" TextColor="{AppThemeBinding Light={StaticResource Need}, Dark={StaticResource NeedDark}}" Clicked="Reset_Clicked"/>
+                    <Label x:Name="Error" Style="{StaticResource FSheet.Error}" Margin="{StaticResource Gutter}" IsVisible="False"/>
+                </VerticalStackLayout>
+            </CollectionView.Footer>
+        </CollectionView>
+        <pages:IsBusyBox x:Name="IsBusyBox" Grid.RowSpan="2" IsVisible="False"/>
+    </Grid>
+</ContentPage>

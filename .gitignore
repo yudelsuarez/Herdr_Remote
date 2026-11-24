@@ -1,0 +1,27 @@
+# Build outputs
+bin/
+obj/
+node_modules/
+
+
+# User-specific files
+.vs/
+*.user
+*.suo
+
+# OS-generated files
+.DS_Store
+
+
+.*
+!.gitignore
+!.github/
+!.gitattributes
+!.editorconfig
+
+# Local only: private notes, agent instructions and personal signing settings
+/odd/
+/CLAUDE.md
+/AGENTS.md
+/HerdrRemote/Art/
+*.local.props

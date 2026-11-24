@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:pages="clr-namespace:HerdrRemote.Pages" x:Class="HerdrRemote.Pages.Reader" Title="Reader" Style="{StaticResource Page}">
+    <!-- Keep the controls below the editor in every phase so they never resize or cover the text. -->
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
+        <pages:Header x:Name="Header" Grid.Row="0">
+            <pages:Header.Accessory>
+                <Border x:Name="Pill" Style="{StaticResource Seg}">
+                    <HorizontalStackLayout Style="{StaticResource Seg.Row}">
+                        <Border x:Name="Cell" Style="{StaticResource Seg.CellOn}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="Voice_Tapped"/>
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout Style="{StaticResource Row.Gap8}">
+                                <Label Style="{StaticResource Voice.Speaker}" Text="&#xE92D;"/>
+                                <Label x:Name="Lbl_Voice" Style="{StaticResource Voice.Summary}"/>
+                                <Label Style="{StaticResource Pill.Chev}" Text="&#xE909;"/>
+                            </HorizontalStackLayout>
+                        </Border>
+                    </HorizontalStackLayout>
+                </Border>
+            </pages:Header.Accessory>
+        </pages:Header>
+        <Editor x:Name="Ed_Text" Grid.Row="1" Style="{StaticResource Reader.Body}" AutoSize="Disabled"/>
+        <!-- The action bar: stays above the keyboard while the text is edited. -->
+        <VerticalStackLayout Grid.Row="2">
+            <BoxView Style="{StaticResource Lst.Divider}"/>
+            <Grid x:Name="ActionSlot" Style="{StaticResource Reader.Bar}" Padding="0" ColumnSpacing="0" ColumnDefinitions="Auto,*">
+                <Button x:Name="Btn_Primary" Grid.Column="0" Style="{StaticResource Btn.Square}" Margin="20,0,0,0" VerticalOptions="Center" Clicked="Btn_Primary_Clicked"/>
+            </Grid>
+        </VerticalStackLayout>
+        <pages:TabsFooter x:Name="Tabs" Grid.Row="3"/>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="HerdrRemote.Pages.ReadingBar" IsVisible="False">
+    <Grid x:Name="Controls" Style="{StaticResource Hdr}" RowDefinitions="52" Padding="6,0,8,0" ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="0">
+        <Grid x:Name="Btn_Pause" Grid.Column="0" Style="{StaticResource Hdr.Button}">
+            <Grid.GestureRecognizers><TapGestureRecognizer Tapped="Pause_Clicked"/></Grid.GestureRecognizers>
+            <Label x:Name="Lbl_Pause" Style="{StaticResource Hdr.IconAcc}"/>
+        </Grid>
+        <Grid x:Name="Source" Grid.Column="1" MinimumWidthRequest="0">
+            <Grid.GestureRecognizers><TapGestureRecognizer Tapped="Source_Tapped"/></Grid.GestureRecognizers>
+            <Label x:Name="Lbl_Source" Style="{StaticResource Hdr.Title}" CharacterSpacing="0" Margin="6,0" VerticalOptions="Center"/>
+        </Grid>
+        <Label x:Name="Lbl_Count" Grid.Column="2" Style="{StaticResource Hdr.Sub}" FontFamily="Geist" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}" Margin="6,0" LineBreakMode="NoWrap" VerticalOptions="Center" HorizontalTextAlignment="End"/>
+        <Grid x:Name="Btn_Rate" Grid.Column="3" Style="{StaticResource Hdr.Button}">
+            <Grid.GestureRecognizers><TapGestureRecognizer Tapped="Rate_Clicked"/></Grid.GestureRecognizers>
+            <Label x:Name="Lbl_Rate" Style="{StaticResource Hdr.Sub}" FontFamily="GeistMedium" FontSize="13" LineBreakMode="NoWrap" VerticalOptions="Center" HorizontalTextAlignment="Center" TextColor="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/>
+        </Grid>
+        <Grid x:Name="Btn_Previous" Grid.Column="4" Style="{StaticResource Hdr.Button}">
+            <Grid.GestureRecognizers><TapGestureRecognizer Tapped="Previous_Clicked"/></Grid.GestureRecognizers>
+            <Label Text="&#xE969;" Style="{StaticResource Hdr.Icon}"/>
+        </Grid>
+        <Grid x:Name="Btn_Next" Grid.Column="5" Style="{StaticResource Hdr.Button}">
+            <Grid.GestureRecognizers><TapGestureRecognizer Tapped="Next_Clicked"/></Grid.GestureRecognizers>
+            <Label Text="&#xE96A;" Style="{StaticResource Hdr.Icon}"/>
+        </Grid>
+        <Grid x:Name="Btn_Close" Grid.Column="6" Style="{StaticResource Hdr.Button}">
+            <Grid.GestureRecognizers><TapGestureRecognizer Tapped="Close_Clicked"/></Grid.GestureRecognizers>
+            <Label Text="&#xE91D;" Style="{StaticResource Hdr.Icon}"/>
+        </Grid>
+    </Grid>
+</ContentView>

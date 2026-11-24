@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="Popups.BottomSheet">
+    <!-- Shared bottom-sheet host: tap the scrim to dismiss; Slot holds each sheet's content. -->
+    <Grid x:Name="Host" SizeChanged="Host_SizeChanged">
+        <Grid x:Name="Scrim" Style="{StaticResource Scrim}" Opacity="0">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="Scrim_Tapped"/>
+            </Grid.GestureRecognizers>
+        </Grid>
+        <Border x:Name="Panel" Style="{StaticResource Sht}" Opacity="0" SizeChanged="Panel_SizeChanged">
+            <Grid RowDefinitions="Auto,*">
+                <Border Style="{StaticResource Sht.Grab}"/>
+                <ContentView x:Name="Slot" Grid.Row="1"/>
+            </Grid>
+        </Border>
+        <!-- Swipe-down zone over the panel's top edge (the grab band). A sibling of Panel, not inside it: the drag moves Panel, and a recognizer on the view it moves would
+             read its TotalY against a shifting origin. It stays stationary during a pan and follows the arranged panel top between gestures; hidden until the panel has slid in. -->
+        <Grid x:Name="DragZone" Style="{StaticResource Sht.DragZone}" IsVisible="False">
+            <Grid.GestureRecognizers>
+                <PanGestureRecognizer PanUpdated="DragZone_PanUpdated"/>
+            </Grid.GestureRecognizers>
+        </Grid>
+    </Grid>
+</ContentView>

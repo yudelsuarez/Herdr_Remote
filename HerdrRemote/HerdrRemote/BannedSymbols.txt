@@ -1,0 +1,1 @@
+P:Microsoft.Maui.Controls.Shell.Current;Throws with two Android windows (dotnet/maui#35108, #35109): use App.CurrentShell, or App.GoToAsync to navigate

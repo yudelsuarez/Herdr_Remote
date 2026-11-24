@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:pages="clr-namespace:HerdrRemote.Pages" x:Class="HerdrRemote.Pages.Provider" Style="{StaticResource Page}">
+    <Grid RowDefinitions="Auto,*">
+        <pages:Header x:Name="Header" BackVisible="True" BackTapped="Back_Clicked">
+            <pages:Header.Accessory><Label x:Name="Lbl_Mark" Style="{StaticResource Lst.Glyph}" AutomationProperties.IsInAccessibleTree="False"/></pages:Header.Accessory>
+        </pages:Header>
+        <ScrollView x:Name="Scroll" Grid.Row="1"><pages:ProviderSection x:Name="Section"/></ScrollView>
+        <pages:IsBusyBox x:Name="IsBusyBox" Grid.RowSpan="2" IsVisible="False"/>
+    </Grid>
+</ContentPage>

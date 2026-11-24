@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:local="clr-namespace:Popups" xmlns:pages="clr-namespace:HerdrRemote.Pages" x:Class="Popups.VoiceSheet" SizeChanged="Sheet_SizeChanged">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*,Auto">
+        <Grid x:Name="SheetHead" Style="{StaticResource Sht.Head}">
+            <Label x:Name="Lbl_Title" Style="{StaticResource Sht.Title}"/>
+            <Button x:Name="Btn_Done" Grid.Column="1" Style="{StaticResource Sht.Action}" MinimumHeightRequest="48" Clicked="Done_Clicked"/>
+        </Grid>
+        <Grid x:Name="ReadingSlot" Grid.Row="1">
+            <pages:ReadingBar x:Name="Reading"/>
+        </Grid>
+        <Border x:Name="ProviderCard" Grid.Row="2" Style="{StaticResource Lst}" Margin="{StaticResource Gutter}">
+            <VerticalStackLayout Spacing="0">
+            <Grid Style="{StaticResource Lst.Row}" ColumnDefinitions="20,*,Auto,16">
+                <Grid.GestureRecognizers><TapGestureRecognizer Tapped="Provider_Tapped"/></Grid.GestureRecognizers>
+                <Label x:Name="Lbl_Mark" Style="{StaticResource Lst.Glyph}" AutomationProperties.IsInAccessibleTree="False"/>
+                <Label x:Name="Lbl_Provider" Grid.Column="1" Style="{StaticResource Lst.Title}" VerticalOptions="Center"/>
+                <Label x:Name="Lbl_ProviderName" Grid.Column="2" Style="{StaticResource Lst.Value}"/>
+                <Label Grid.Column="3" Style="{StaticResource Lst.Chev}" Text="&#xE907;"/>
+            </Grid>
+            <Grid x:Name="SetUpRow" RowDefinitions="Auto,Auto" IsVisible="False">
+                <BoxView Style="{StaticResource Lst.Divider}"/>
+                <Button x:Name="Btn_SetUp" Grid.Row="1" Style="{StaticResource Btn.Text}" MinimumHeightRequest="50" Clicked="SetUp_Clicked"/>
+            </Grid>
+            <BoxView Style="{StaticResource Lst.Divider}"/>
+            <Grid Style="{StaticResource Lst.Row}" ColumnDefinitions="20,*,Auto,16">
+                <Label Style="{StaticResource Lst.Glyph}" Text="&#xE924;" AutomationProperties.IsInAccessibleTree="False"/>
+                <Label x:Name="Lbl_Sample" Grid.Column="1" Style="{StaticResource Lst.Title}" VerticalOptions="Center"/>
+                <Picker x:Name="Pk_Sample" Grid.Column="2" MinimumWidthRequest="64" MinimumHeightRequest="50" BackgroundColor="Transparent" FontFamily="Geist" FontSize="14" TextColor="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}" SelectedIndexChanged="Sample_Changed"/>
+                <Label Grid.Column="3" Style="{StaticResource Lst.Chev}" Text="&#xE907;" InputTransparent="True"/>
+            </Grid>
+            </VerticalStackLayout>
+        </Border>
+        <Border x:Name="SearchRow" Grid.Row="3" Style="{StaticResource Lst}" Margin="16,12,16,0">
+            <Grid ColumnDefinitions="20,*,44" ColumnSpacing="12" Padding="14,0,0,0" MinimumHeightRequest="46">
+                <Label Style="{StaticResource Lst.Glyph}" Text="&#xE906;" AutomationProperties.IsInAccessibleTree="False"/>
+                <Entry x:Name="En_Search" Grid.Column="1" Style="{StaticResource Fld.Entry}" FontFamily="Geist" FontSize="15" TextChanged="Search_Changed" Focused="Search_FocusChanged" Unfocused="Search_FocusChanged"/>
+                <Button x:Name="Btn_Clear" Grid.Column="2" Text="&#xE91D;" Style="{StaticResource TrayKey.Icon}" BackgroundColor="Transparent" HeightRequest="44" Clicked="Clear_Clicked"/>
+            </Grid>
+        </Border>
+        <Border x:Name="LanguageRow" Grid.Row="4" Style="{StaticResource Lst}" Margin="16,12,16,0" IsVisible="False">
+            <Grid Style="{StaticResource Lst.Row}" ColumnDefinitions="20,*,Auto,16">
+                <Label Style="{StaticResource Lst.Glyph}" Text="&#xE924;" AutomationProperties.IsInAccessibleTree="False"/>
+                <Label x:Name="Lbl_Filter" Grid.Column="1" Style="{StaticResource Lst.Title}" VerticalOptions="Center"/>
+                <Picker x:Name="Pk_Language" Grid.Column="2" MinimumWidthRequest="64" MinimumHeightRequest="50" BackgroundColor="Transparent" FontFamily="Geist" FontSize="14" TextColor="{AppThemeBinding Light={StaticResource Ink2}, Dark={StaticResource Ink2Dark}}" SelectedIndexChanged="Language_Changed"/>
+                <Label Grid.Column="3" Style="{StaticResource Lst.Chev}" Text="&#xE907;" InputTransparent="True"/>
+            </Grid>
+        </Border>
+        <Border x:Name="ManualRow" Grid.Row="5" Style="{StaticResource Lst}" Padding="14,0" Margin="16,12,16,0" IsVisible="False">
+            <Entry x:Name="En_Manual" Style="{StaticResource Fld.Entry}" FontFamily="Geist" TextChanged="Manual_Changed" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False"/>
+        </Border>
+        <Grid x:Name="ListCard" Grid.Row="6" RowDefinitions="44,*" Margin="{StaticResource Gutter}">
+            <Grid ColumnDefinitions="*,44">
+                <Label x:Name="Lbl_Voices" Style="{StaticResource Lst.Sub}" FontFamily="Geist" FontSize="13" VerticalOptions="Center"/>
+                <Button x:Name="Btn_Refresh" Grid.Column="1" Text="&#xE912;" Style="{StaticResource TrayKey.Icon}" BackgroundColor="Transparent" HeightRequest="44" Clicked="Refresh_Clicked"/>
+            </Grid>
+        <Border Grid.Row="1" Style="{StaticResource Lst}" Margin="0" VerticalOptions="Start">
+        <CollectionView x:Name="Items" Style="{StaticResource Lst.Options}" SelectionMode="Single" ItemsUpdatingScrollMode="KeepItemsInView" SelectionChanged="Item_SelectionChanged">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="local:VoiceSheet+VoiceRow">
+                    <Grid MinimumHeightRequest="64" SemanticProperties.Description="{Binding Name}" SemanticProperties.Hint="{Binding StateDescription}">
+                    <Grid Style="{StaticResource Lst.Row}" ColumnDefinitions="20,*,44" MinimumHeightRequest="64" Padding="14,0,0,0">
+                        <Label Text="{Binding ProviderGlyph}" Style="{StaticResource Lst.Glyph}" AutomationProperties.IsInAccessibleTree="False"/>
+                        <Label IsVisible="{Binding IsVoice}" Text="{Binding Mark}" Style="{StaticResource Lst.Check}" AutomationProperties.IsInAccessibleTree="False"/>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                            <Label Text="{Binding Name}" Style="{StaticResource Lst.Title}" LineBreakMode="TailTruncation" MaxLines="1"/>
+                            <Label Text="{Binding Detail}" Style="{StaticResource Lst.Sub}" FontFamily="Geist" LineBreakMode="TailTruncation" MaxLines="1">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding Detail.Length}" Value="0"><Setter Property="IsVisible" Value="False"/></DataTrigger>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsInUse}" Value="True"><Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Acc}, Dark={StaticResource AccDark}}"/></DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </VerticalStackLayout>
+                        <Button Grid.Column="2" IsVisible="{Binding IsVoice}" Text="{Binding ListenGlyph}" Style="{StaticResource TrayKey.Icon}" BackgroundColor="Transparent" HeightRequest="44" VerticalOptions="Center" Clicked="Listen_Clicked" SemanticProperties.Description="{Binding ActionDescription}"/>
+                    </Grid>
+                        <BoxView VerticalOptions="End" Style="{StaticResource Lst.Divider}"/>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        </Border>
+        </Grid>
+        <Grid x:Name="FooterScroll" Grid.Row="7" RowDefinitions="Auto,Auto" RowSpacing="12" Margin="{StaticResource Gutter}">
+        <ScrollView x:Name="Notes">
+        <VerticalStackLayout Spacing="4">
+            <Label x:Name="Lbl_Note" Style="{StaticResource Sht.Foot}" Padding="0"/>
+            <Label x:Name="Lbl_Partial" Style="{StaticResource Sht.Foot}" Padding="0"/>
+            <HorizontalStackLayout>
+                <Button x:Name="Btn_More" Style="{StaticResource Btn.Outline}" Clicked="More_Clicked" IsVisible="False"/>
+                <Button x:Name="Btn_Scope" Style="{StaticResource Btn.Outline}" Clicked="Scope_Clicked" IsVisible="False"/>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+        </ScrollView>
+            <Button x:Name="Btn_Use" Grid.Row="1" Style="{StaticResource Btn.Primary}" MinimumHeightRequest="48" Clicked="Use_Clicked"/>
+        </Grid>
+    </Grid>
+</ContentView>
