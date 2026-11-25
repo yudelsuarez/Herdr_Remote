@@ -35,7 +35,7 @@ public partial class ConnectionCard : ContentView
 	{
 		SessionState.Connected => "Connected",
 		SessionState.Reconnecting => "Reconnecting…",
-		SessionState.Unreachable => "Mac not reachable",
+		SessionState.Unreachable => "Machine not reachable",
 		SessionState.AuthFailed => "Key not accepted",
 		SessionState.PasswordRefused => "Password not accepted",
 		SessionState.HostKeyUnknown => "Not trusted yet",
@@ -71,22 +71,22 @@ public partial class ConnectionCard : ContentView
 		CardButton edit = new("edit", "Edit connection");
 		CardButton disconnect = new("disconnect", "Disconnect");
 		Look look = !setUp
-			? new("Info", "", "Connect to your Mac", "Turn on Remote Login on the Mac, then enter its address and your user.", [new("setup", "Set up")])
+			? new("Info", "", "Connect to your machine", "Turn on SSH on the machine (on a Mac: Remote Login), then enter its address and your user.", [new("setup", "Set up")])
 			: state switch
 			{
 				SessionState.Connected => new("Ok", "", "Connected to {0}", "", [disconnect]),
-				SessionState.Reconnecting => new("Warn", TurningGlyph, "Connection lost", "Trying again by itself. Your agents keep running on the Mac.", [disconnect]),
-				SessionState.Unreachable => new("Late", "", "Mac not reachable", "Check that the Mac is on and awake and on the same network as this phone.", [retry, edit]),
-				SessionState.AuthFailed => new("Late", "", "The Mac didn't accept this phone's key", "Type the Mac password once to add it.", [new("password", "Add key")]),
-				SessionState.PasswordRefused => new("Late", "", "Password not accepted", "Type it again. The Mac must allow password sign-in.", [new("password", "Type it again")]),
-				SessionState.HostKeyUnknown => new("Warn", "", "Trust this Mac?", "This phone hasn't connected to this Mac before.", [new("trust", "Review")]),
-				SessionState.HostKeyChanged => new("Late", "", "This Mac's identity changed", "If you did not reinstall the Mac, do not continue.", [new("details", "Details"), edit]),
-				SessionState.HerdrNotFound => new("Late", "", "herdr not found on the Mac", "Install herdr on the Mac, then try again.", [retry]),
-				SessionState.HerdrNotRunning => new("Late", "", "herdr is not running", "Open herdr on the Mac, then try again.", [retry]),
+				SessionState.Reconnecting => new("Warn", TurningGlyph, "Connection lost", "Trying again by itself. Your agents keep running on the machine.", [disconnect]),
+				SessionState.Unreachable => new("Late", "", "Machine not reachable", "Check that the machine is on, awake, and on the same network as this phone.", [retry, edit]),
+				SessionState.AuthFailed => new("Late", "", "The machine didn't accept this phone's key", "Type the machine password once to add it.", [new("password", "Add key")]),
+				SessionState.PasswordRefused => new("Late", "", "Password not accepted", "Type it again. The machine must allow password sign-in.", [new("password", "Type it again")]),
+				SessionState.HostKeyUnknown => new("Warn", "", "Trust this machine?", "This phone hasn't connected to this machine before.", [new("trust", "Review")]),
+				SessionState.HostKeyChanged => new("Late", "", "This machine's identity changed", "If you did not reinstall the machine, do not continue.", [new("details", "Details"), edit]),
+				SessionState.HerdrNotFound => new("Late", "", "herdr not found on the machine", "Install herdr on the machine, then try again.", [retry]),
+				SessionState.HerdrNotRunning => new("Late", "", "herdr is not running", "Open herdr on the machine, then try again.", [retry]),
 				SessionState.Failed => new("Late", "", "Connection failed", "Something went wrong while connecting.", [retry, new("details", "Details")]),
-				SessionState.DisconnectedByOwner => new("Info", "", "Disconnected", "You disconnected from this Mac.", [new("connect", "Connect")]),
+				SessionState.DisconnectedByOwner => new("Info", "", "Disconnected", "You disconnected from this machine.", [new("connect", "Connect")]),
 				// Connecting, and Disconnected while configured: the instant before a connect publishes Connecting.
-				_ => new("Info", TurningGlyph, "Connecting to your Mac…", "", []),
+				_ => new("Info", TurningGlyph, "Connecting to your machine…", "", []),
 			};
 
 		(string card, string ink) = look.Tone switch

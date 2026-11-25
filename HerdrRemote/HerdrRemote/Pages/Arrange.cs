@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Globalization;
-using System.Text;
 using System.Text.Json.Nodes;
 using HerdrRemote.Remote;
 using HerdrRemote.Services;
@@ -27,26 +26,11 @@ internal sealed record ArrangeHost(Func<string, Task> Open, string? Pane = null,
 // Shared list, sidebar, and header actions: menus, sheets, terminal creation, splitting, renaming, and closing.
 internal static class Arrange
 {
-	// List up to 500 subfolders of $1, matching herdr-app's cap. Include directory symlinks, skip hidden entries,
-	// and exit 1 when $1 is not a directory.
-	private const string BrowseScript = "n=0; for p in \"$1\"/*; do [ -d \"$p\" ] || continue; printf \"%s\\0\" \"${p##*/}\"; n=$((n+1)); [ \"$n\" -ge 500 ] && break; done; test -d \"$1\"";
-
-	private static CoreApi? _api;
-	private static HerdrCreate? _create;
 	// One ask at a time: a second tap while a sheet or a start is under way does nothing.
 	private static bool _busy;
 
 	// The shared pieces of this connection (a new connection gets new ones); null while not connected.
-	private static HerdrCreate? Create()
-	{
-		if (App.Herdr.State != SessionState.Connected || App.Herdr.Api is not { } api) { return null; }
-		if (!ReferenceEquals(api, _api))
-		{
-			_api = api;
-			_create = new HerdrCreate(api, App.Herdr.Agents);
-		}
-		return _create;
-	}
+	private static HerdrCreate? Create() => App.Herdr.State == SessionState.Connected ? App.Herdr.Creation : null;
 
 	// Does what was asked; every failure ends in one dialog (the core's own words for its errors), never in a crash.
 	public static async Task AskAsync(ArrangeHost host, ArrangeAsk ask)
@@ -167,11 +151,11 @@ internal static class Arrange
 		return glyph;
 	}
 
-	// New space offers folders already in use and Browse; selecting one starts the Mac shell in a new space and tab, then opens it.
+	// New space offers folders already in use and Browse; selecting one starts the remote shell in a new space and tab, then opens it.
 	private static async Task NewSpaceAsync(ArrangeHost host, HerdrCreate create)
 	{
-		MacFacts facts = await create.FactsAsync(CancellationToken.None);
-		string? folder = await ListSheet.PickFolderAsync(facts.Home, FoldersInUse(), dir => ListAsync(create, dir), host.CanInsert);
+		ShellFacts facts = await create.FactsAsync(CancellationToken.None);
+		string? folder = await ListSheet.PickFolderAsync(facts.Home, FoldersInUse(), dir => create.ListFoldersAsync(dir, CancellationToken.None), host.CanInsert);
 		if (folder is null) { return; }
 		string address = await create.RunAsync([], folder, true, HerdrCreate.NewId("sp"), HerdrCreate.NewId("tb"), host.Size, Pane.DisplayColors(), CancellationToken.None);
 		await host.Open(address);
@@ -186,25 +170,16 @@ internal static class Arrange
 		return [.. folders.OfType<string>().Where(folder => folder.Length > 0).Distinct()];
 	}
 
-	// A folder's sub-folders on the Mac, null when it cannot be listed.
-	private static async Task<List<string>?> ListAsync(HerdrCreate create, string dir)
-	{
-		if (App.Herdr.Api is not { } api) { return null; }
-		CoreExec result = await api.ExecAsync(["sh", "-c", BrowseScript, "browse", dir], null, 10, CancellationToken.None);
-		if (result.Code != 0) { return null; }
-		return [.. Encoding.UTF8.GetString(result.Stdout).Split('\0', StringSplitOptions.RemoveEmptyEntries)];
-	}
-
 	// Match herdr-app's new-menu order: Terminal, Start an agent (one row per installed agent), New space.
 	// Show cached agents immediately; refresh the list when unknown or older than 60 seconds.
 	private static async Task NewMenuAsync(ArrangeHost host, HerdrCreate create, string spaceId)
 	{
 		AgentSpace? space = App.Herdr.Agents.Arranged.Find(s => s.Id == spaceId);
 		if (space is null || spaceId.Length == 0) { return; }
-		List<string>? installed = HerdrCreate.Installed;
+		List<string>? installed = create.Installed;
 		MenuSheet? sheet = null;
 		Task<MenuSheet.Row?> picked = MenuSheet.PopAsync(space.Name, NewEntries(installed, false), opened => sheet = opened, CanInsert: host.CanInsert);
-		if (!HerdrCreate.InstalledFresh) { _ = RefreshAsync(); }
+		if (!create.InstalledFresh) { _ = RefreshAsync(); }
 		MenuSheet.Row? row = await picked;
 		if (row is null) { return; }
 		if (row.Glyph == "\uE902")
@@ -213,7 +188,7 @@ internal static class Arrange
 			return;
 		}
 		IReadOnlyList<string> argv = row.Agent is { } key
-			? HerdrCreate.AgentArgv((await create.FactsAsync(CancellationToken.None)).Shell, HerdrAgents.Startable.First(agent => agent.Key == key).Run)
+			? await create.AgentArgvAsync(HerdrAgents.Startable.First(agent => agent.Key == key).Run, CancellationToken.None)
 			: [];
 		await NewTabAsync(host, create, spaceId, argv);
 
@@ -250,7 +225,7 @@ internal static class Arrange
 		return entries;
 	}
 
-	// Start argv in a new tab (empty argv uses the Mac shell), then open it. Use the current pane's folder
+	// Start argv in a new tab (empty argv uses the core shell), then open it. Use the current pane's folder
 	// when it belongs to this space; otherwise use the space's current folder.
 	private static async Task NewTabAsync(ArrangeHost host, HerdrCreate create, string spaceId, IReadOnlyList<string> argv)
 	{
@@ -269,7 +244,7 @@ internal static class Arrange
 		MenuSheet.Row newTab = new(i18n.Translate("New tab"), Glyph: "\uE902");
 		MenuSheet.Row close = new(i18n.Translate("Close"), Glyph: "\uE91D", Need: true);
 		List<MenuSheet.Entry> entries = space.Pending
-			? [newTab, new MenuSheet.Separator(), close, new MenuSheet.Note(i18n.Translate("Waiting for Herdr on the Mac to place it."))]
+			? [newTab, new MenuSheet.Separator(), close, new MenuSheet.Note(i18n.Translate("Waiting for Herdr on the machine to place it."))]
 			: [rename, new MenuSheet.Separator(), close];
 		MenuSheet.Row? row = await MenuSheet.PopAsync(space.Name, entries, lead: AgentList.Tile(space.Name, space.Order), CanInsert: host.CanInsert);
 		if (row == rename) { await RenameAsync(host, create, spaceId, null); }
@@ -286,7 +261,7 @@ internal static class Arrange
 		MenuSheet.Row newTab = new(i18n.Translate("New tab"), Glyph: "\uE902");
 		MenuSheet.Row close = new(i18n.Translate("Close"), Glyph: "\uE91D", Need: true);
 		List<MenuSheet.Entry> entries = tab.Root is null
-			? [newTab, new MenuSheet.Separator(), close, new MenuSheet.Note(i18n.Translate("Waiting for Herdr on the Mac to place it."))]
+			? [newTab, new MenuSheet.Separator(), close, new MenuSheet.Note(i18n.Translate("Waiting for Herdr on the machine to place it."))]
 			: [rename, newTab, new MenuSheet.Separator(), close];
 		MenuSheet.Row? row = await MenuSheet.PopAsync(TabName(tab), entries, lead: Mark(TabMark(tab)), CanInsert: host.CanInsert);
 		if (row == rename) { await RenameAsync(host, create, spaceId, tabId); }
@@ -301,7 +276,7 @@ internal static class Arrange
 	// selects the document's current name, or is empty for an automatic name. Hints explain folder / number fallbacks.
 	// Save trims text into spaces[i].name or tabs[j].name via EditDocumentAsync: read, edit in place, compare-and-set,
 	// at most three attempts. Document events refresh the list. After three conflicts, keep the sheet open with
-	// "The layout changed on the Mac. Try again."; connection or core errors also keep it open with their message.
+	// "The layout changed on the machine. Try again."; connection or core errors also keep it open with their message.
 	// If the space or tab disappears, write nothing and close the sheet. Cancel makes no change.
 	private static async Task RenameAsync(ArrangeHost host, HerdrCreate create, string spaceId, string? tabId)
 	{
@@ -321,7 +296,7 @@ internal static class Arrange
 			try
 			{
 				DocEdit edit = await create.EditDocumentAsync(document => SetName(document, spaceId, tabId, wanted), CancellationToken.None);
-				return edit == DocEdit.Conflicted ? new FormSheet.Outcome(i18n.Translate("The layout changed on the Mac. Try again.")) : new FormSheet.Outcome(null, wanted);
+				return edit == DocEdit.Conflicted ? new FormSheet.Outcome(i18n.Translate("The layout changed on the machine. Try again.")) : new FormSheet.Outcome(null, wanted);
 			}
 			catch (Exception ex)
 			{
@@ -342,7 +317,7 @@ internal static class Arrange
 		return true;
 	}
 
-	// Match herdr-app's pane.split: start the Mac shell in the pane's folder, falling back to the space's current
+	// Match herdr-app's pane.split: start the core shell in the pane's folder, falling back to the space's current
 	// folder, or home if a followed folder has disappeared. Preserve space and tab labels. HerdrLayout.SplitAfter
 	// validates the tree and idempotently places the terminal after the pane on the chosen axis, removing any prior
 	// automatic adoption at the tab's right edge. Compare-and-set retries at most three times. On success, open
@@ -361,7 +336,7 @@ internal static class Arrange
 			return;
 		}
 		Debug.WriteLine($"[Arrange] split {axis} of {pane} with {terminal}: {edit}");
-		await BusyRunner.Show("Error", i18n.Translate(edit == DocEdit.Conflicted ? "The layout changed on the Mac. Try again." : "Something went wrong, please try again"), host.CanInsert);
+		await BusyRunner.Show("Error", i18n.Translate(edit == DocEdit.Conflicted ? "The layout changed on the machine. Try again." : "Something went wrong, please try again"), host.CanInsert);
 	}
 
 	// Compute the full kill set, including all descendant agents. Confirm a space with "Close space?" and
@@ -434,14 +409,11 @@ internal static class Arrange
 	// terminal's name, as herdr-app's pane header.
 	internal static string PaneName(AgentTerminal terminal) => HerdrAgents.ProgramName(terminal.App) is { Length: > 0 } program ? program : terminal.Name;
 
-	// The Mac's home folder, for paths shown with "~"; null when it cannot be asked.
+	// The remote home for paths shown with "~"; a failed lookup leaves the full path visible.
 	internal static async Task<string?> HomeAsync()
 	{
 		if (Create() is not { } create) { return null; }
-		try
-		{
-			return (await create.FactsAsync(CancellationToken.None)).Home;
-		}
+		try { return (await create.FactsAsync(CancellationToken.None)).Home; }
 		catch (Exception ex)
 		{
 			Debug.WriteLine($"[Arrange] home: {ex.Message}");
@@ -466,8 +438,12 @@ internal static class Arrange
 		if (pane.Word is not null) { entries.Add(pin); }
 		entries.Add(read);
 		if (CanClosePane(address)) { entries.AddRange([new MenuSheet.Separator(), close]); }
-		string home = (await create.FactsAsync(CancellationToken.None)).Home;
-		string subtitle = App.Herdr.Agents.FolderOf(address) is { Length: > 0 } folder ? $"{address} · {ListSheet.Tilde(folder, home)}" : address;
+		string? home = null;
+		try { home = (await create.FactsAsync(CancellationToken.None)).Home; }
+		catch (Exception ex) { Debug.WriteLine($"[Arrange] pane menu home: {ex.Message}"); }
+		string subtitle = App.Herdr.Agents.FolderOf(address) is { Length: > 0 } folder
+			? $"{address} · {(home is null ? folder : RemotePath.Tilde(folder, home, RemotePath.IsWindows(home)))}"
+			: address;
 		MenuSheet.Row? row = await MenuSheet.PopAsync(PaneName(pane), entries, lead: Mark(pane.Mark), subtitle: subtitle, CanInsert: host.CanInsert);
 		if (row == splitRight) { await SplitAsync(host, create, address, HerdrLayout.Right); }
 		else if (row == splitDown) { await SplitAsync(host, create, address, HerdrLayout.Down); }

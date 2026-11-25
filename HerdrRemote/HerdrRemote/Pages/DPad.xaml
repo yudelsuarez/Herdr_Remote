@@ -22,7 +22,8 @@
             <PanGestureRecognizer PanUpdated="Grab_PanUpdated"/>
         </Grid.GestureRecognizers>
     </Grid>
-    <Grid ColumnDefinitions="52,52,52" RowDefinitions="52,52,52" ColumnSpacing="6" RowSpacing="6" InputTransparent="True" CascadeInputTransparent="False">
+    <ScrollView x:Name="CompactBody" Orientation="Horizontal" HorizontalScrollBarVisibility="Never" IsVisible="False"/>
+    <Grid x:Name="Keys" ColumnDefinitions="52,52,52" RowDefinitions="52,52,52" ColumnSpacing="6" RowSpacing="6" InputTransparent="True" CascadeInputTransparent="False">
         <Button x:Name="Corner_TL" Grid.Row="0" Grid.Column="0" Style="{StaticResource DPadKey}" Pressed="Corner_Pressed" Released="Repeat_Released" Clicked="Corner_Clicked"/>
         <Button x:Name="Btn_Up" Grid.Row="0" Grid.Column="1" Text="&#xE909;" Rotation="180" CommandParameter="up" Style="{StaticResource DPadKey}" Pressed="Repeat_Pressed" Released="Repeat_Released"/>
         <Button x:Name="Corner_TR" Grid.Row="0" Grid.Column="2" Style="{StaticResource DPadKey}" Pressed="Corner_Pressed" Released="Repeat_Released" Clicked="Corner_Clicked"/>

@@ -50,7 +50,7 @@ public sealed class MenuSheet : ContentView
 		cancel.Clicked += (_, _) => _close(null);
 		head.Add(cancel, 1);
 		Fill(_snapshot);
-		Content = new VerticalStackLayout { Children = { head, _entries } };
+		Content = new ScrollView { Content = new VerticalStackLayout { Children = { head, _entries } } };
 	}
 
 	// Opens the menu; the result is the tapped row, null on Cancel or the dimmed page. opened receives the sheet, for a

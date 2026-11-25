@@ -5,10 +5,10 @@
 **Tus agentes de IA, en tu bolsillo.** Remote Shell es una app para iPhone y Android que lleva tu workspace de
 [herdr](https://herdr.dev) al teléfono: cada agente, cada panel y sus respuestas, todo en una sola app.
 
-Arranca un agente en tu Mac, aléjate y sigue trabajando desde el teléfono: ve quién está trabajando, quién terminó y quién te
+Arranca un agente en tu máquina, aléjate y sigue trabajando desde el teléfono: ve quién está trabajando, quién terminó y quién te
 necesita, lee o escucha la respuesta, dicta el siguiente prompt y envíalo.
 
-> **Estado:** beta. Las versiones para App Store y Google Play están en camino; mientras tanto puedes compilarla desde el código.
+<p align="center"><a href="https://apps.apple.com/app/id6838730267">App Store</a> · <a href="https://play.google.com/store/apps/details?id=com.yudelsuarez.remoteshell">Google Play</a></p>
 
 <p align="center">
   <img src="docs/images/01-agents.png" width="180" alt="Cada agente con su estado">
@@ -47,17 +47,19 @@ necesita, lee o escucha la respuesta, dicta el siguiente prompt y envíalo.
 
 ## Qué necesitas
 
-- Un Mac con [herdr](https://herdr.dev) (la app habla con `hc`, la herramienta de línea de comandos de herdr).
-- **Sesión remota** activada en Ajustes del Sistema del Mac (Compartir), para que el teléfono llegue por SSH.
-- Un iPhone o iPad con iOS 16 o superior, o un Android con Android 13 o superior, en la misma red que el Mac (o accesible por tu VPN).
+- Una máquina con [herdr](https://herdr.dev) en macOS, Linux o Windows (la app habla con `hc`, la herramienta de línea de
+  comandos de herdr).
+- SSH activado en la máquina. El teléfono se conecta desde la red de tu casa, o desde cualquier lugar con
+  [Tailscale](docs/getting-started.es.md#úsala-fuera-de-casa) u otra VPN, sin abrir ningún puerto en tu router.
+- Un iPhone o iPad con iOS 16 o posterior, o un teléfono Android con Android 13 o posterior.
 
 Configuración paso a paso: [Primeros pasos](docs/getting-started.es.md).
 
 ## Seguridad y privacidad
 
-Remote Shell se conecta **directo** de tu teléfono a tu Mac por SSH. No hay ningún servidor en medio, ni cuentas, ni analítica
-ni rastreo. El teléfono crea su propia llave, guardada en el almacenamiento seguro del sistema, y la identidad del Mac queda
-fijada. Las voces y el dictado en la nube son opcionales y usan tus propias claves.
+Remote Shell se conecta **directo** de tu teléfono a tu máquina por SSH. No hay ningún servidor en medio, ni cuentas, ni
+analítica ni rastreo. El teléfono crea su propia llave, guardada en el almacenamiento seguro del sistema, y la identidad de la
+máquina queda fijada. Las voces y el dictado en la nube son opcionales y usan tus propias claves.
 
 Los detalles y qué datos van a dónde: [Seguridad y privacidad](docs/security-and-privacy.es.md). Para reportar una
 vulnerabilidad, mira [SECURITY.md](SECURITY.md).
@@ -96,14 +98,24 @@ del llavero en `Platforms/iOS/Entitlements.plist`, y dale a la app su propio nom
 <summary><b>¿Funciona sin herdr?</b></summary>
 
 No. Remote Shell acompaña a [herdr](https://herdr.dev): muestra y controla los workspaces, agentes y terminales que herdr
-tiene abiertos en tu Mac.
+tiene abiertos en tu máquina.
 </details>
 
 <details>
 <summary><b>¿Mi código pasa por algún servidor?</b></summary>
 
-No. El teléfono se conecta directo a tu Mac por SSH. Solo las voces y el dictado en la nube, que son opcionales, envían algo a
+No. El teléfono se conecta directo a tu máquina por SSH. Solo las voces y el dictado en la nube, que son opcionales, envían algo a
 otro lugar, y solo al proveedor que elijas. Mira [Seguridad y privacidad](docs/security-and-privacy.es.md).
+</details>
+
+<details>
+<summary><b>¿La puedo usar fuera de casa? ¿Tengo que abrir un puerto?</b></summary>
+
+Sí puedes, y no hace falta. Pon el teléfono y la máquina en la misma red privada con [Tailscale](https://tailscale.com)
+(gratis para uso personal) u otra VPN, y conéctate al nombre o la dirección de Tailscale de la máquina. No abres nada en tu
+router, funciona aunque tu proveedor de internet comparta una IP pública entre muchos clientes (CGNAT) y SSH nunca queda
+expuesto a internet: solo tus propios equipos llegan a él, y el tráfico va cifrado de punta a punta aunque pase por un
+relevo. Pasos: [Úsala fuera de casa](docs/getting-started.es.md#úsala-fuera-de-casa).
 </details>
 
 <details>

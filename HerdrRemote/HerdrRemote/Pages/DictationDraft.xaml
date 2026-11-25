@@ -3,7 +3,7 @@
     <!-- Draft overlay below the notice slot: it never resizes the terminal and scrolls within short terminal cells.
          It shows state, input level, timer, language, provider, notices and Retry, then text and actions.
          Text is read-only while listening and editable otherwise; labels are set in code. -->
-    <Border Style="{StaticResource Draft}">
+    <Border x:Name="Card" Style="{StaticResource Draft}">
         <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="6">
             <Grid Grid.Row="0" Style="{StaticResource Draft.Status}" ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="8">
                 <Label x:Name="Lbl_State" Grid.Column="0" Style="{StaticResource Draft.State}"/>
@@ -31,7 +31,7 @@
                     <Label x:Name="Lbl_Live" Style="{StaticResource Draft.LiveText}"/>
                 </Border>
             </Grid>
-            <Grid Grid.Row="3" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="6">
+            <Grid x:Name="Actions" Grid.Row="3" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="6">
                 <Button x:Name="Btn_Discard" Grid.Column="0" Text="&#xE91D;" Style="{StaticResource TrayKey.Icon}" Clicked="Discard_Clicked"/>
                 <Button x:Name="Btn_Send" Grid.Column="2" Style="{StaticResource TrayKey}" Clicked="Send_Clicked"/>
                 <Button x:Name="Btn_SendEnter" Grid.Column="3" Style="{StaticResource TrayKey.Primary}" Clicked="SendEnter_Clicked"/>

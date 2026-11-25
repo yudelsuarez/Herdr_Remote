@@ -1,8 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="Popups.ListSheet">
-    <!-- Folder mode lists folders in use and Browse; browsing adds a back button, path, loading/error/empty note,
-         parent and child folders, and Open here. Reuse ListPicker's virtualized list, capped at MaxRows and refitted on reload.
-         Provider filtering replaces Cancel with a count and shows a filter field, matching rows or an empty-result note. -->
+    <!-- Folder mode includes Browse; provider mode filters the shared list. -->
     <VerticalStackLayout>
         <Grid Style="{StaticResource List.Head}">
             <Button x:Name="Btn_Back" Grid.Column="0" Style="{StaticResource List.Back}" Text="&#xE908;" IsVisible="False" Clicked="Back_Clicked"/>

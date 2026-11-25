@@ -53,7 +53,7 @@
 	<!-- iOS asks for consent before the first connection to a local address and quotes this sentence.
 	     Spanish lives in Resources/es.lproj/InfoPlist.strings. No NSBonjourServices: the app does no discovery. -->
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Remote Shell connects to herdr on your Mac over your Wi-Fi. Without this, the app cannot show your spaces.</string>
+	<string>Remote Shell connects to herdr on your machine over your Wi-Fi. Without this, the app cannot show your spaces.</string>
 	<!-- iOS asks before the first "Save to photos" of an agent's image and quotes this sentence (add only, no reading). -->
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Remote Shell saves the images your agents show to your photos when you tap Save to photos.</string>
@@ -65,6 +65,11 @@
 	<string>Remote Shell listens only while you dictate a message for your agent.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Remote Shell turns your dictation into text on this device.</string>
+	<!-- Export compliance: SSH uses only standard, published algorithms (via SSH.NET and BouncyCastle) and the App Store
+	     listing excludes France, so no export documentation is required. This pre-answers App Store Connect's questionnaire.
+	     Before adding France to the App Store availability, a French encryption declaration is required. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
 </dict>

@@ -17,10 +17,18 @@ public partial class DPad : VerticalStackLayout
 	private double _startX;
 	private double _startY;
 	private IReadOnlyList<Corner>? _corners;
+	private readonly Thickness _normalPadding;
+	private readonly GridLength[] _normalRows, _normalColumns;
+	private readonly (Button Key, int Row, int Column)[] _keys;
+	private bool _compact;
 
 	public DPad()
 	{
 		InitializeComponent();
+		_normalPadding = Padding;
+		_normalRows = Keys.RowDefinitions.Select(row => row.Height).ToArray();
+		_normalColumns = Keys.ColumnDefinitions.Select(column => column.Width).ToArray();
+		_keys = Keys.Children.Cast<Button>().Select(key => (key, Grid.GetRow(key), Grid.GetColumn(key))).ToArray();
 		ApplyConfiguration();
 		Loaded += (_, _) => { Shortcuts.Changed += ApplyConfiguration; ApplyConfiguration(); };
 		Unloaded += (_, _) => { Shortcuts.Changed -= ApplyConfiguration; Repeat_Released(this, EventArgs.Empty); };
@@ -76,10 +84,50 @@ public partial class DPad : VerticalStackLayout
 	// Put where it was left (centered until first dragged), inside the view it floats over.
 	public void Place()
 	{
-		if (_room is not { Width: > 0 } room || Width <= 0) { return; }
+		if (!IsVisible || _room is not { Width: > 0, Height: > 0 } room) { return; }
+		bool compact = room.Height < _normalRows.Sum(row => row.Value) + Keys.RowSpacing * (_normalRows.Length - 1)
+			+ Grab.HeightRequest + Spacing + _normalPadding.VerticalThickness
+			|| room.Width < _normalColumns.Sum(column => column.Value) + Keys.ColumnSpacing * (_normalColumns.Length - 1)
+			+ _normalPadding.HorizontalThickness;
+		if (compact != _compact) { SetCompact(compact); }
+		if (compact)
+		{
+			double width = Math.Min(room.Width, CompactWidth());
+			if (CompactBody.WidthRequest != width) { CompactBody.WidthRequest = width; }
+		}
+		if (Width <= 0) { return; }
 		(double x, double y) = RemoteSettings.DPadAt ?? (0.5, 0.5);
 		TranslationX = Math.Round(x * Math.Max(0, room.Width - Width));
 		TranslationY = Math.Round(y * Math.Max(0, room.Height - Height));
+	}
+
+	private const double CompactKey = 44;
+
+	private double CompactWidth() => Keys.ColumnDefinitions.Sum(column => column.Width.Value)
+		+ Keys.ColumnSpacing * (Keys.ColumnDefinitions.Count - 1);
+
+	private void SetCompact(bool compact)
+	{
+		_compact = compact;
+		Repeat_Released(this, EventArgs.Empty);
+		Grab.IsVisible = !compact;
+		Padding = compact ? Thickness.Zero : _normalPadding;
+		if (compact) { Children.Remove(Keys); CompactBody.Content = Keys; }
+		else { CompactBody.Content = null; Children.Add(Keys); }
+		Keys.RowDefinitions = new RowDefinitionCollection((compact ? [new GridLength(CompactKey)] : _normalRows)
+			.Select(height => new RowDefinition(height)).ToArray());
+		Keys.ColumnDefinitions = new ColumnDefinitionCollection((compact ? _keys.Select(_ => new GridLength(CompactKey)) : _normalColumns)
+			.Select(width => new ColumnDefinition(width)).ToArray());
+		for (int i = 0; i < _keys.Length; i++)
+		{
+			(Button key, int row, int column) = _keys[i];
+			Grid.SetRow(key, compact ? 0 : row);
+			Grid.SetColumn(key, compact ? i : column);
+			if (compact) { key.WidthRequest = key.HeightRequest = CompactKey; }
+			else { key.ClearValue(WidthRequestProperty); key.ClearValue(HeightRequestProperty); }
+		}
+		CompactBody.HeightRequest = CompactKey;
+		CompactBody.IsVisible = compact;
 	}
 
 	// The view it floats over is its parent: it is placed again whenever that one changes size.

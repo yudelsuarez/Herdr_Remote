@@ -39,21 +39,22 @@ public sealed class PaneSheet : ContentView
 					piece => _close(new Pick(Act.Open, piece))));
 			}
 		}
-		Content = body;
+		Content = new ScrollView { Content = body };
 	}
 
 	// Opens the sheet on the pane at address of space; the answer, or null on the dimmed page or a drag down.
 	internal static Task<Pick?> PopAsync(AgentSpace space, string address, string? home, bool canClose, Func<ContentPage, Layout, bool>? CanInsert = null)
 		=> PopupsHandle.PopBottomSheetAsync<Pick?>(close => new PaneSheet(space, address, home, canClose, close), CanInsert: CanInsert);
 
-	// herdr-app's pane header: mark, name, folder ("~" for home), "⋯"; under a hairline the buttons, divided by hairlines.
+	// herdr-app's pane header: mark, name, folder and "⋯", then the action buttons.
 	private View Block(AgentTerminal pane, string? home, bool canClose)
 	{
 		Grid head = new() { Style = App.Res<Style>("PSheet.Head") };
 		head.Add(Arrangement.Mark(pane.Mark));
 		head.Add(new Label { Style = App.Res<Style>("PSheet.Name"), Text = Arrangement.PaneName(pane) }, 1);
 		string? folder = App.Herdr.Agents.FolderOf(pane.Address);
-		head.Add(new Label { Style = App.Res<Style>("PSheet.Folder"), Text = folder is null ? "" : home is null ? folder : ListSheet.Tilde(folder, home) }, 2);
+		if (folder is not null && home is not null) { folder = RemotePath.Tilde(folder, home, RemotePath.IsWindows(home)); }
+		head.Add(new Label { Style = App.Res<Style>("PSheet.Folder"), Text = folder ?? "" }, 2);
 		head.Add(MoreKey(i18n.Translate("More"), () => _close(new Pick(Act.More, pane.Address))), 3);
 		List<(string Glyph, string Text, bool Need, Act Act)> acts = [];
 		if (Arrangement.CanSplit(pane.Address))

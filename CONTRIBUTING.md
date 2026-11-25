@@ -3,6 +3,7 @@
 Thanks for your interest in Remote Shell. Bug reports, ideas and pull requests are welcome.
 
 - **Bugs and ideas:** open an issue. Include the app version, the platform (iPhone or Android) and the steps to see the problem.
+  For connection issues, include the machine's operating system (macOS, Linux, or Windows) and version.
 - **Security problems:** do not open an issue; follow [SECURITY.md](SECURITY.md).
 
 ## Before you send a pull request
@@ -13,7 +14,8 @@ Thanks for your interest in Remote Shell. Bug reports, ideas and pull requests a
 - Agent support is generic: a change for one agent CLI (Claude Code, Codex, OpenCode, pi, ...) must not change how the others
   behave.
 - Code and comments are in English. User-visible text needs its Spanish line in
-  `HerdrRemote/HerdrRemote/Languages/es-US_Español.txt`.
+  `HerdrRemote/HerdrRemote/Languages/es-US_Español.txt`. Call the remote computer **machine** in English and **máquina** in Spanish.
+  Keep **host key** as the SSH term, and use **Remote Login** only for the macOS feature.
 - If you change the terminal (`HerdrRemote/terminal-web/src`), rebuild the bundle with `./build.sh` in that folder.
 - Keep pull requests small and focused, and explain what you tested and on which device.
 

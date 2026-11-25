@@ -70,6 +70,15 @@ internal static class TerminalInput
 		return Encoding.UTF8.GetBytes(modes.BracketedPaste ? $"\e[200~{lines.Replace("\e", "", StringComparison.Ordinal)}\e[201~" : lines);
 	}
 
+	// Match Herdr's desktop file paste: one destination-shell word, a space, and no Enter.
+	internal static byte[] Attachment(string path, TerminalModes modes)
+	{
+		bool windows = RemotePath.IsWindows(path);
+		string word = path.All(c => char.IsAsciiLetterOrDigit(c) || "/._-+=:@%~".Contains(c) || (!windows && c == ','))
+			? path : windows ? "'" + path.Replace("'", "''", StringComparison.Ordinal) + "'" : SshRemoteCommands.Quote(path);
+		return Text(word + " ", true, modes);
+	}
+
 	// Encode a left click (press then release) or wheel step (64 up, 65 down; press only) at a zero-based cell.
 	// Use SGR 1006 when requested, otherwise xterm's original byte encoding. Return null if mouse reporting is disabled.
 	public static byte[]? Mouse(int button, int count, int column, int row, TerminalModes modes)

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:local="clr-namespace:Popups" xmlns:pages="clr-namespace:HerdrRemote.Pages" x:Class="Popups.VoiceSheet" SizeChanged="Sheet_SizeChanged">
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*,Auto">
-        <Grid x:Name="SheetHead" Style="{StaticResource Sht.Head}">
+    <Grid x:Name="Body" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*,Auto" ColumnDefinitions="*,Auto">
+        <Grid x:Name="SheetHead" Grid.ColumnSpan="2" Style="{StaticResource Sht.Head}">
             <Label x:Name="Lbl_Title" Style="{StaticResource Sht.Title}"/>
             <Button x:Name="Btn_Done" Grid.Column="1" Style="{StaticResource Sht.Action}" MinimumHeightRequest="48" Clicked="Done_Clicked"/>
         </Grid>
-        <Grid x:Name="ReadingSlot" Grid.Row="1">
+        <Grid x:Name="ReadingSlot" Grid.Row="1" Grid.ColumnSpan="2">
             <pages:ReadingBar x:Name="Reading"/>
         </Grid>
-        <Border x:Name="ProviderCard" Grid.Row="2" Style="{StaticResource Lst}" Margin="{StaticResource Gutter}">
+        <Border x:Name="ProviderCard" Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource Lst}" Margin="{StaticResource Gutter}">
             <VerticalStackLayout Spacing="0">
             <Grid Style="{StaticResource Lst.Row}" ColumnDefinitions="20,*,Auto,16">
                 <Grid.GestureRecognizers><TapGestureRecognizer Tapped="Provider_Tapped"/></Grid.GestureRecognizers>
@@ -30,14 +30,14 @@
             </Grid>
             </VerticalStackLayout>
         </Border>
-        <Border x:Name="SearchRow" Grid.Row="3" Style="{StaticResource Lst}" Margin="16,12,16,0">
+        <Border x:Name="SearchRow" Grid.Row="3" Grid.ColumnSpan="2" Style="{StaticResource Lst}" Margin="16,12,16,0">
             <Grid ColumnDefinitions="20,*,44" ColumnSpacing="12" Padding="14,0,0,0" MinimumHeightRequest="46">
                 <Label Style="{StaticResource Lst.Glyph}" Text="&#xE906;" AutomationProperties.IsInAccessibleTree="False"/>
                 <Entry x:Name="En_Search" Grid.Column="1" Style="{StaticResource Fld.Entry}" FontFamily="Geist" FontSize="15" TextChanged="Search_Changed" Focused="Search_FocusChanged" Unfocused="Search_FocusChanged"/>
                 <Button x:Name="Btn_Clear" Grid.Column="2" Text="&#xE91D;" Style="{StaticResource TrayKey.Icon}" BackgroundColor="Transparent" HeightRequest="44" Clicked="Clear_Clicked"/>
             </Grid>
         </Border>
-        <Border x:Name="LanguageRow" Grid.Row="4" Style="{StaticResource Lst}" Margin="16,12,16,0" IsVisible="False">
+        <Border x:Name="LanguageRow" Grid.Row="4" Grid.ColumnSpan="2" Style="{StaticResource Lst}" Margin="16,12,16,0" IsVisible="False">
             <Grid Style="{StaticResource Lst.Row}" ColumnDefinitions="20,*,Auto,16">
                 <Label Style="{StaticResource Lst.Glyph}" Text="&#xE924;" AutomationProperties.IsInAccessibleTree="False"/>
                 <Label x:Name="Lbl_Filter" Grid.Column="1" Style="{StaticResource Lst.Title}" VerticalOptions="Center"/>
@@ -45,15 +45,15 @@
                 <Label Grid.Column="3" Style="{StaticResource Lst.Chev}" Text="&#xE907;" InputTransparent="True"/>
             </Grid>
         </Border>
-        <Border x:Name="ManualRow" Grid.Row="5" Style="{StaticResource Lst}" Padding="14,0" Margin="16,12,16,0" IsVisible="False">
+        <Border x:Name="ManualRow" Grid.Row="5" Grid.ColumnSpan="2" Style="{StaticResource Lst}" Padding="14,0" Margin="16,12,16,0" IsVisible="False">
             <Entry x:Name="En_Manual" Style="{StaticResource Fld.Entry}" FontFamily="Geist" TextChanged="Manual_Changed" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False"/>
         </Border>
-        <Grid x:Name="ListCard" Grid.Row="6" RowDefinitions="44,*" Margin="{StaticResource Gutter}">
-            <Grid ColumnDefinitions="*,44">
+        <Grid x:Name="ListCard" Grid.Row="6" Grid.ColumnSpan="2" RowDefinitions="Auto,*" Margin="{StaticResource Gutter}">
+            <Grid x:Name="ListHead" ColumnDefinitions="*,44" HeightRequest="44">
                 <Label x:Name="Lbl_Voices" Style="{StaticResource Lst.Sub}" FontFamily="Geist" FontSize="13" VerticalOptions="Center"/>
                 <Button x:Name="Btn_Refresh" Grid.Column="1" Text="&#xE912;" Style="{StaticResource TrayKey.Icon}" BackgroundColor="Transparent" HeightRequest="44" Clicked="Refresh_Clicked"/>
             </Grid>
-        <Border Grid.Row="1" Style="{StaticResource Lst}" Margin="0" VerticalOptions="Start">
+        <Border Grid.Row="1" Style="{StaticResource Lst}" Margin="0" VerticalOptions="Fill">
         <CollectionView x:Name="Items" Style="{StaticResource Lst.Options}" SelectionMode="Single" ItemsUpdatingScrollMode="KeepItemsInView" SelectionChanged="Item_SelectionChanged">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="local:VoiceSheet+VoiceRow">
@@ -79,7 +79,7 @@
         </CollectionView>
         </Border>
         </Grid>
-        <Grid x:Name="FooterScroll" Grid.Row="7" RowDefinitions="Auto,Auto" RowSpacing="12" Margin="{StaticResource Gutter}">
+        <Grid x:Name="FooterScroll" Grid.Row="7" Grid.ColumnSpan="2" RowDefinitions="Auto,Auto" RowSpacing="12" Margin="{StaticResource Gutter}">
         <ScrollView x:Name="Notes">
         <VerticalStackLayout Spacing="4">
             <Label x:Name="Lbl_Note" Style="{StaticResource Sht.Foot}" Padding="0"/>

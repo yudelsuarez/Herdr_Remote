@@ -32,11 +32,11 @@ internal static class HostKeyPrompt
 	{
 		if (_open || App.Herdr.OfferedHostKey is not { } offered) { return false; }
 		string trust = i18n.Translate("Trust");
-		string sentence = string.Format(CultureInfo.CurrentCulture, i18n.Translate("First time connecting to {0}. Make sure it's your Mac."), RemoteSettings.Host);
+		string sentence = string.Format(CultureInfo.CurrentCulture, i18n.Translate("First time connecting to {0}. Make sure it's your machine."), RemoteSettings.Host);
 		_open = true;
 		try
 		{
-			if (await SheetAsync(i18n.Translate("Trust this Mac?"), sentence, offered, [trust, i18n.Translate("Cancel")]) != trust)
+			if (await SheetAsync(i18n.Translate("Trust this machine?"), sentence, offered, [trust, i18n.Translate("Cancel")]) != trust)
 			{
 				_dismissedKey = offered;
 				TrustAnswered?.Invoke(false);
@@ -57,7 +57,7 @@ internal static class HostKeyPrompt
 		_open = true;
 		try
 		{
-			if (await SheetAsync(i18n.Translate("Host key"), i18n.Translate("This Mac's identity changed, so this phone did not connect. If you did not reinstall the Mac, do not continue. To accept it, forget the host key in the connection settings."), offered, [ok]) == ok)
+			if (await SheetAsync(i18n.Translate("Host key"), i18n.Translate("This machine's identity changed, so this phone did not connect. If you did not reinstall the machine, do not continue. To accept the new key, choose Forget host key in connection settings."), offered, [ok]) == ok)
 			{
 				_dismissedKey = offered;
 			}

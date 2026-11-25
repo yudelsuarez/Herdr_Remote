@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace HerdrRemote.Remote;
@@ -13,6 +16,12 @@ internal sealed record CoreAttach(CoreStream Stream, JsonObject Terminal);
 // Keep terminal records as JSON (address, name, argv, cwd, state, cols, rows, title, status, turn, labels, etc.).
 internal sealed class CoreApi(CoreConnection connection)
 {
+	internal const string AttachmentTooLarge = "Attachments must be 8 MB or smaller.";
+	internal const string AttachmentsUnavailable = "This version of Herdr does not support attachments.";
+	private const int PutPiece = 128 * 1024;
+	// This JSON goes to a framed RPC, not HTML. Keeping Base64 '+' literal keeps legacy puts below the 16 MiB limit.
+	private static readonly JsonSerializerOptions PutJson = new() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+
 	// Read a live or finished terminal's screen plus `lines` of preceding history.
 	public async Task<CoreRead> ReadAsync(string terminal, int lines, CancellationToken ct)
 	{
@@ -73,7 +82,7 @@ internal sealed class CoreApi(CoreConnection connection)
 
 	// Start a terminal for herdr-app to adopt. Space and tab labels place it; unknown IDs create new spaces or tabs.
 	// herdr.seen "0" means no turn has been seen, and keep replaces a lost program with a shell, matching herdr-app.
-	// An empty argv uses the Mac's shell. size sets the initial grid, or null uses the core default until a viewer attaches.
+	// With empty argv, Herdr chooses its shell. size sets the initial grid, or null uses the core default.
 	// display supplies the same colors Pane sends on attach. Return the address; launch failures throw CoreRpcException Kind "spawn_failed".
 	public async Task<string> RunAsync(IReadOnlyList<string> argv, string? cwd, string spaceId, string tabId, (int Cols, int Rows)? size, JsonObject? display, CancellationToken ct)
 	{
@@ -108,9 +117,89 @@ internal sealed class CoreApi(CoreConnection connection)
 		await connection.CallAsync("terminal.get", new JsonObject { ["terminal"] = terminal }, ct).ConfigureAwait(false) as JsonObject
 			?? throw new InvalidDataException("terminal.get returned no terminal.");
 
-	// Run argv directly on the Mac without a shell or terminal. After `seconds`, end it and its descendants.
+	// Herdr owns attachment placement and cleanup on the selected terminal's machine.
+	public async Task<string> PutAsync(string terminal, Stream source, string name, CancellationToken ct)
+	{
+		const int limit = 8 * 1024 * 1024;
+		bool Has(string name) => connection.Hello["methods"] is JsonArray methods
+			&& methods.Any(method => method?.GetValue<string>() == name);
+		bool chunked = Has("terminal.put_begin") && Has("terminal.put_chunk") && Has("terminal.put_finish") && Has("terminal.put_abort");
+		if (!chunked && !Has("terminal.put"))
+		{
+			throw new InvalidDataException(AttachmentsUnavailable);
+		}
+		if (source.CanSeek && source.Length - source.Position > limit) { throw new InvalidDataException(AttachmentTooLarge); }
+		using MemoryStream data = new();
+		byte[] block = new byte[81920];
+		int read;
+		while ((read = await source.ReadAsync(block.AsMemory(0, (int)Math.Min(block.Length, limit + 1 - data.Length)), ct).ConfigureAwait(false)) > 0)
+		{
+			if (data.Length + read > limit) { throw new InvalidDataException(AttachmentTooLarge); }
+			data.Write(block, 0, read);
+		}
+		ct.ThrowIfCancellationRequested();
+		int size = (int)data.Length;
+		JsonNode? result = chunked
+			? await PutChunksAsync(terminal, data.GetBuffer(), size, name, ct).ConfigureAwait(false)
+			: await PutLegacyAsync(terminal, data.GetBuffer(), size, name, ct).ConfigureAwait(false);
+		if (result?["path"]?.GetValue<string>() is not { Length: > 0 } path || path.Any(char.IsControl)
+			|| result["bytes"]?.GetValue<long>() != size)
+		{
+			throw new InvalidDataException("Herdr returned an invalid attachment.");
+		}
+		return path;
+	}
+
+	private Task<JsonNode?> PutLegacyAsync(string terminal, byte[] data, int size, string name, CancellationToken ct) =>
+		// Compatibility with cores before chunked puts (herdr-core v0.1.21): one frame, sized under the frame limit, with a
+		// deadline scaled to its size. Such a core cannot interleave other traffic with it or abort it once queued.
+		connection.CallAsync("terminal.put", new JsonObject
+		{
+			["terminal"] = terminal,
+			["name"] = name,
+			["data"] = Convert.ToBase64String(data, 0, size),
+		}, ct, CoreConnection.CallTimeout + TimeSpan.FromSeconds(4 * ((size + PutPiece - 1) / PutPiece)), PutJson);
+
+	private async Task<JsonNode?> PutChunksAsync(string terminal, byte[] data, int size, string name, CancellationToken ct)
+	{
+		string transfer = Guid.NewGuid().ToString("N");
+		try
+		{
+			JsonNode? begin = await connection.CallAsync("terminal.put_begin", new JsonObject
+			{
+				["terminal"] = terminal, ["name"] = name, ["bytes"] = size, ["transfer"] = transfer,
+			}, ct).ConfigureAwait(false);
+			if (begin?["transfer"]?.GetValue<string>() != transfer) { throw new InvalidDataException("Herdr did not begin the attachment transfer."); }
+			for (int offset = 0; offset < size;)
+			{
+				ct.ThrowIfCancellationRequested();
+				int count = Math.Min(PutPiece, size - offset);
+				JsonNode? piece = await connection.CallAsync("terminal.put_chunk", new JsonObject
+				{
+					["transfer"] = transfer, ["offset"] = offset, ["data"] = Convert.ToBase64String(data, offset, count),
+				}, ct, json: PutJson).ConfigureAwait(false);
+				offset += count;
+				if (piece?["bytes"]?.GetValue<int>() != offset) { throw new InvalidDataException("Herdr did not acknowledge the attachment piece."); }
+			}
+			ct.ThrowIfCancellationRequested();
+			return await connection.CallAsync("terminal.put_finish", new JsonObject { ["transfer"] = transfer }, ct).ConfigureAwait(false);
+		}
+		catch
+		{
+			// The connection owns the transfer; abort also covers a begin whose reply was lost or canceled.
+			try
+			{
+				await connection.CallAsync("terminal.put_abort", new JsonObject { ["transfer"] = transfer }, CancellationToken.None)
+					.ConfigureAwait(false);
+			}
+			catch (Exception ex) { Debug.WriteLine($"[Core] attachment abort: {ex.GetType().Name}"); }
+			throw;
+		}
+	}
+
+	// Run argv directly on the core's machine without a shell or terminal.
 	// Nonzero exits and timeouts are returned as results. The RPC deadline adds the usual call timeout to the program deadline.
-	public async Task<CoreExec> ExecAsync(IReadOnlyList<string> argv, string? cwd, int seconds, CancellationToken ct)
+	public async Task<CoreExec> ExecAsync(IReadOnlyList<string> argv, string? cwd, int seconds, CancellationToken ct, byte[]? input = null)
 	{
 		JsonObject parameters = new()
 		{
@@ -118,6 +207,7 @@ internal sealed class CoreApi(CoreConnection connection)
 			["timeout"] = seconds,
 		};
 		if (cwd is not null) { parameters["cwd"] = cwd; }
+		if (input is not null) { parameters["input"] = Convert.ToBase64String(input); }
 		JsonNode? r = await connection.CallAsync("machine.exec", parameters, ct, TimeSpan.FromSeconds(seconds) + CoreConnection.CallTimeout).ConfigureAwait(false);
 		return new CoreExec(
 			r?["code"]?.GetValue<int>(),

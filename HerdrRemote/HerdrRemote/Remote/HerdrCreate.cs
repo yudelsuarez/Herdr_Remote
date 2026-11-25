@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json.Nodes;
 
 namespace HerdrRemote.Remote;
@@ -8,8 +9,7 @@ namespace HerdrRemote.Remote;
 // target is gone; Conflicted writes nothing after three compare-and-set conflicts.
 internal enum DocEdit { Written, Unchanged, Conflicted }
 
-// The Mac's login shell and home directory. An empty $SHELL falls back to /bin/sh, matching herdr-app.
-internal sealed record MacFacts(string Shell, string Home);
+internal sealed record ShellFacts(string Shell, string Home);
 
 // The scope of a close operation: pane, tab or space.
 internal enum CloseLevel { Pane, Tab, Space }
@@ -18,39 +18,97 @@ internal enum CloseLevel { Pane, Tab, Space }
 // Space closures also include tab and pane counts for the "Close space?" confirmation.
 internal sealed record ClosePlan(CloseLevel Level, AgentSpace Space, AgentTab? Tab, List<string> Terminals, int Tabs, int Panes);
 
-// Shared creation and layout operations for one connection: fresh IDs, cached Mac information, current space folders,
+// Shared creation and layout operations for one connection: fresh IDs, cached shell facts, current space folders,
 // compare-and-set edits to herdr-app's document, and terminals this phone started in the last 30 s. No UI dependency.
-internal sealed class HerdrCreate(CoreApi api, HerdrAgents agents)
+internal sealed class HerdrCreate(CoreApi api, HerdrAgents agents, bool windows)
 {
 	private const string Document = "herdr-app";
 	private const int EditTries = 3;
+	private const string WindowsShell = "powershell.exe";
+	// The core launches its own processes, independently of the SSH login shell.
+	private static List<string> WindowsArgv(string script, string shell = WindowsShell, bool loadProfile = false) =>
+		[shell, "-NoLogo", loadProfile ? "-NonInteractive" : "-NoProfile", "-EncodedCommand", SshRemoteCommands.EncodePowerShell(script)];
+
+	// Match herdr-core's built-in Windows shell: the prompt syncs the process cwd after the user's prompt runs.
+	private const string WindowsPrompt = """
+		$global:__hc_prompt = $function:prompt; function global:prompt { $p = & $global:__hc_prompt; $l = $ExecutionContext.SessionState.Path.CurrentLocation; if ($l.Provider.Name -eq 'FileSystem') { try { [Environment]::CurrentDirectory = $l.ProviderPath } catch {} }; $p }
+		""";
+
+	// Keep the POSIX argv byte-for-byte and list at most 500 visible directory names, separated by NUL.
+	private const string BrowseScript = "n=0; for p in \"$1\"/*; do [ -d \"$p\" ] || continue; printf \"%s\\0\" \"${p##*/}\"; n=$((n+1)); [ \"$n\" -ge 500 ] && break; done; test -d \"$1\"";
+	private const string WindowsBrowse = SshRemoteCommands.Utf8Console + """
+		$ErrorActionPreference = 'Stop'
+		$ProgressPreference = 'SilentlyContinue'
+		trap { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }
+		$reader = [IO.StreamReader]::new([Console]::OpenStandardInput(), [Text.Encoding]::UTF8)
+		$dir = $reader.ReadToEnd()
+		if (!(Test-Path -LiteralPath $dir -PathType Container)) { exit 1 }
+		Get-ChildItem -LiteralPath $dir -Directory | Where-Object { !$_.Name.StartsWith('.') } |
+		    Select-Object -First 500 | ForEach-Object { [Console]::Write($_.Name + [char]0) }
+		exit 0
+		""";
+
+	// Resolve native commands and .cmd shims before .ps1 shims, which can be blocked by the host's execution policy.
+	private const string FindWindowsAgent = """
+		function Find-Agent($name) {
+		    $entry = Get-Command -Name $name -CommandType Application -ErrorAction SilentlyContinue |
+		        Where-Object { [IO.Path]::GetExtension($_.Path) -in '.exe', '.com', '.cmd', '.bat' } | Select-Object -First 1
+		    if (!$entry) { $entry = Get-Command -Name ($name + '.ps1') -CommandType ExternalScript -ErrorAction SilentlyContinue | Select-Object -First 1 }
+		    $entry
+		}
+		""";
 	// Track newly launched terminals for the same time window as herdr-app.
 	private static readonly TimeSpan BornFor = TimeSpan.FromSeconds(30);
 
 	// The UI thread adds launches and the stream-end handler reads them; lock every access.
 	private readonly Dictionary<string, long> _born = [];
 	private readonly Lock _bornLock = new();
-	private Task<MacFacts>? _facts;
+
+	private Task<ShellFacts>? _facts;
 
 	// Match herdr-app IDs: a prefix (`sp` space, `tb` tab, `p` pane block, `s` split container) plus 32 lowercase hex digits.
 	public static string NewId(string prefix) => prefix + Convert.ToHexStringLower(RandomNumberGenerator.GetBytes(16));
 
 	// Read shell and home once per connection. Retry on the next request if the read fails.
-	public Task<MacFacts> FactsAsync(CancellationToken ct)
+	public Task<ShellFacts> FactsAsync(CancellationToken ct)
 	{
 		if (_facts is { IsFaulted: false, IsCanceled: false } facts) { return facts; }
 		return _facts = ReadFactsAsync(ct);
 	}
 
-	private async Task<MacFacts> ReadFactsAsync(CancellationToken ct)
+	private async Task<ShellFacts> ReadFactsAsync(CancellationToken ct)
 	{
-		CoreExec result = await api.ExecAsync(["sh", "-c", "printf \"%s\\n%s\" \"$SHELL\" \"$HOME\""], null, 10, ct).ConfigureAwait(false);
-		if (result.Code != 0) { throw new InvalidDataException($"Reading the Mac's shell and home failed (exit {result.Code}): {result.Error.Trim()}"); }
+		IReadOnlyList<string> argv = windows ? WindowsArgv(SshRemoteCommands.Utf8Console + """
+			$pwsh = Get-Command pwsh.exe -CommandType Application -ErrorAction Ignore | Select-Object -First 1
+			$shell = if ($pwsh) { $pwsh.Source } else { [IO.Path]::Combine($PSHOME, 'powershell.exe') }
+			[Console]::WriteLine($shell.Replace([char]92, [char]47)); [Console]::Write($HOME)
+			""")
+			: ["sh", "-c", "printf \"%s\\n%s\" \"$SHELL\" \"$HOME\""];
+		CoreExec result = await api.ExecAsync(argv, null, 10, ct).ConfigureAwait(false);
+		if (result.Code != 0) { throw new InvalidDataException($"Reading the remote shell and home failed (exit {result.Code}): {result.Error.Trim()}"); }
+		if (windows)
+		{
+			string[] facts = result.Out.Split('\n', 2);
+			string executable = facts[0].TrimEnd('\r');
+			// A forward slash prevents terminal.run from treating the executable as a template name.
+			if (!RemotePath.IsWindows(executable) || !executable.Contains('/')) { throw new InvalidDataException("The machine reported no PowerShell path."); }
+			return facts is [_, { Length: > 0 } profile] ? new ShellFacts(executable, profile)
+				: throw new InvalidDataException("The machine reported no home folder.");
+		}
 		string[] lines = result.Out.Split('\n');
 		string shell = lines[0].Trim();
 		string home = lines.Length > 1 ? lines[1].Trim() : "";
-		if (home.Length == 0) { throw new InvalidDataException("The Mac reported no home folder."); }
-		return new MacFacts(shell.Length > 0 ? shell : "/bin/sh", home);
+		if (home.Length == 0) { throw new InvalidDataException("The machine reported no home folder."); }
+		return new ShellFacts(shell.Length > 0 ? shell : "/bin/sh", home);
+	}
+
+	internal async Task<List<string>?> ListFoldersAsync(string dir, CancellationToken ct)
+	{
+		ct.ThrowIfCancellationRequested();
+		CoreExec result = windows
+			? await api.ExecAsync(WindowsArgv(WindowsBrowse), null, 10, ct, Encoding.UTF8.GetBytes(dir)).ConfigureAwait(false)
+			: await api.ExecAsync(["sh", "-c", BrowseScript, "browse", dir], null, 10, ct).ConfigureAwait(false);
+		return result.Code == 0 ? [.. result.Out.Split('\0', StringSplitOptions.RemoveEmptyEntries)] : null;
 	}
 
 	// Resolve a space's current folder when the action runs, matching herdr-app: first live terminal's folder,
@@ -201,27 +259,55 @@ internal sealed class HerdrCreate(CoreApi api, HerdrAgents agents)
 		return address;
 	}
 
-	// Match herdr-app on macOS: the login shell runs the agent command, then remains as an interactive login shell.
+	// The machine's shell runs the agent command, then stays interactive.
 	// A missing command leaves the shell open with its own error message.
-	public static List<string> AgentArgv(string shell, IEnumerable<string> run)
+	internal async Task<List<string>> AgentArgvAsync(IReadOnlyList<string> run, CancellationToken ct)
 	{
+		ShellFacts facts = await FactsAsync(ct).ConfigureAwait(false);
+		if (windows)
+		{
+			string command = SshRemoteCommands.PowerShellValue(run[0]);
+			string arguments = string.Join("; ", run.Skip(1).Select(SshRemoteCommands.PowerShellValue));
+			string script = WindowsPrompt + "\n" + FindWindowsAgent + "\n" + $$"""
+				$name = {{command}}
+				$entry = Find-Agent $name
+				if ($entry) {
+				    $agentArgs = @({{arguments}})
+				    if ($agentArgs -ccontains '--no-daemon') {
+				        try {
+				            $global:LASTEXITCODE = 0
+				            $helpLines = & $entry.Path '--help' 2>&1
+				            if ($? -and $LASTEXITCODE -eq 0) {
+				                $helpText = $helpLines -join "`n"
+				                if ($helpText.Trim() -and $helpText -cnotmatch '(?<![\w-])--no-daemon(?![\w-])') {
+				                    $agentArgs = @($agentArgs | Where-Object { $_ -cne '--no-daemon' })
+				                }
+				            }
+				        } catch { }
+				    }
+				    & $entry.Path @agentArgs
+				} else { Get-Command -Name $name -CommandType Application }
+				""";
+			return [facts.Shell, "-NoExit", "-Command", script];
+		}
+		string shell = facts.Shell;
 		bool fish = Path.GetFileName(shell) == "fish";
 		return [shell, "-lic", fish ? "command $argv[2..]; exec $argv[1] -li" : "\"$@\"; exec \"$0\" -li", shell, .. run];
 	}
 
-	// Cache the installed-agent commands and response time for this app run, matching herdr-app's 60 s cache.
+	// Cache installed-agent commands for this connection, matching herdr-app's 60 s cache.
 	private static readonly TimeSpan InstalledFor = TimeSpan.FromSeconds(60);
-	private static List<string>? _installed;
-	private static long _installedAt;
-	private static Task<List<string>>? _checking;
+	private List<string>? _installed;
+	private long _installedAt;
+	private Task<List<string>>? _checking;
 
-	// Commands found by the last check, or null before the first successful check in this app run.
-	public static List<string>? Installed => _installed;
+	// Commands found by the last check, or null before the first successful check on this connection.
+	public List<string>? Installed => _installed;
 
 	// Whether the cached result is less than 60 s old.
-	public static bool InstalledFresh => _installed is not null && Environment.TickCount64 - _installedAt < InstalledFor.TotalMilliseconds;
+	public bool InstalledFresh => _installed is not null && Environment.TickCount64 - _installedAt < InstalledFor.TotalMilliseconds;
 
-	// Ask the Mac's login shell which agent commands it can run, with only one check in flight.
+	// Ask which agents the login environment can run, with only one check in flight.
 	// Require exit code 0 and a herdr-check-complete line; read commands from herdr-has: lines.
 	// Failures propagate without replacing the last successful result.
 	public Task<List<string>> CheckInstalledAsync(CancellationToken ct)
@@ -232,18 +318,18 @@ internal sealed class HerdrCreate(CoreApi api, HerdrAgents agents)
 
 	private async Task<List<string>> CheckAsync(CancellationToken ct)
 	{
-		MacFacts facts = await FactsAsync(ct).ConfigureAwait(false);
+		ShellFacts facts = await FactsAsync(ct).ConfigureAwait(false);
 		List<string> commands = [.. HerdrAgents.Startable.Select(agent => agent.Run[0]).Distinct()];
-		bool fish = Path.GetFileName(facts.Shell) == "fish";
-		// Check commands in the shell itself: functions count, but aliases do not because "$@" cannot invoke them.
-		// Use marked lines so startup output from an interactive shell does not obscure the results.
-		string checks = string.Join(" ", commands.Select(command =>
+		CoreExec result;
+		if (windows)
 		{
-			string word = "'" + command.Replace("'", "'\\''", StringComparison.Ordinal) + "'";
-			string unalias = fish ? "" : $"unalias -- {word} 2>/dev/null; ";
-			return $"{unalias}command -v {word} >/dev/null 2>&1 && printf 'herdr-has:%s\\n' {word};";
-		}));
-		CoreExec result = await api.ExecAsync([facts.Shell, "-lic", $"{checks} printf '\\nherdr-check-complete\\n'"], null, 30, ct).ConfigureAwait(false);
+			string names = string.Join("; ", commands.Select(SshRemoteCommands.PowerShellValue));
+			result = await api.ExecAsync(WindowsArgv(SshRemoteCommands.Utf8Console + FindWindowsAgent + "\n" + $$"""
+				foreach ($name in @({{names}})) { if (Find-Agent $name) { [Console]::WriteLine('herdr-has:' + $name) } }
+				[Console]::WriteLine('herdr-check-complete')
+				""", facts.Shell, loadProfile: true), null, 30, ct).ConfigureAwait(false);
+		}
+		else { result = await CheckUnixAsync(facts, commands, ct).ConfigureAwait(false); }
 		string output = result.Out;
 		if (result.Code != 0 || !output.Split('\n').Any(line => line.TrimEnd('\r') == "herdr-check-complete"))
 		{
@@ -254,5 +340,19 @@ internal sealed class HerdrCreate(CoreApi api, HerdrAgents agents)
 		_installed = [.. commands.Where(found.Contains)];
 		_installedAt = Environment.TickCount64;
 		return _installed;
+	}
+
+	private Task<CoreExec> CheckUnixAsync(ShellFacts facts, List<string> commands, CancellationToken ct)
+	{
+		bool fish = Path.GetFileName(facts.Shell) == "fish";
+		// Check commands in the shell itself: functions count, but aliases do not because "$@" cannot invoke them.
+		// Use marked lines so startup output from an interactive shell does not obscure the results.
+		string checks = string.Join(" ", commands.Select(command =>
+		{
+			string word = "'" + command.Replace("'", "'\\''", StringComparison.Ordinal) + "'";
+			string unalias = fish ? "" : $"unalias -- {word} 2>/dev/null; ";
+			return $"{unalias}command -v {word} >/dev/null 2>&1 && printf 'herdr-has:%s\\n' {word};";
+		}));
+		return api.ExecAsync([facts.Shell, "-lic", $"{checks} printf '\\nherdr-check-complete\\n'"], null, 30, ct);
 	}
 }

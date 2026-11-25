@@ -37,10 +37,10 @@ public partial class Connection : ContentPage, IQueryAttributable
 		InitializeComponent();
 		_run = new BusyRunner(IsBusyBox);
 		Header.TitleText = i18n.Translate("Connection");
-		Lbl_Host.Text = i18n.Translate("Mac address");
+		Lbl_Host.Text = i18n.Translate("Machine address");
 		Lbl_Port.Text = i18n.Translate("Port");
 		Lbl_User.Text = i18n.Translate("User");
-		Span_Password.Text = i18n.Translate("Mac password");
+		Span_Password.Text = i18n.Translate("Machine password");
 		Span_PasswordNote.Text = " · " + i18n.Translate("used once to add this phone's key");
 		Btn_Save.Text = i18n.Translate("Save and connect");
 		En_Host.Text = RemoteSettings.Host;
@@ -109,7 +109,7 @@ public partial class Connection : ContentPage, IQueryAttributable
 		string pin = RemoteSettings.PinnedHostKey;
 		bool pinned = pin.Length > 0;
 		bool changed = pinned && state == SessionState.HostKeyChanged;
-		Lbl_PasswordHint.Text = i18n.Translate("The eye shows or hides the text.") + (pinned ? " " + i18n.Translate("Changing the address or port means trusting the Mac again.") : "");
+		Lbl_PasswordHint.Text = i18n.Translate("The eye shows or hides the text.") + (pinned ? " " + i18n.Translate("Changing the address or port means trusting the machine again.") : "");
 		const string Sha = "SHA256:";
 		int fingerprint = pin.IndexOf(Sha, StringComparison.Ordinal) + Sha.Length;
 		string trusted = fingerprint >= Sha.Length ? Sha + pin.Substring(fingerprint, Math.Min(3, pin.Length - fingerprint)) + "…" : i18n.Translate("Trusted");
@@ -198,7 +198,7 @@ public partial class Connection : ContentPage, IQueryAttributable
 			string user = (En_User.Text ?? "").Trim();
 			if (host.Length == 0 || user.Length == 0)
 			{
-				await BusyRunner.Show("Connection", i18n.Translate("Enter the Mac's address and user first."));
+				await BusyRunner.Show("Connection", i18n.Translate("Enter the machine's address and user first."));
 				return;
 			}
 			if (!int.TryParse((En_Port.Text ?? "").Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out int port) || port is < 1 or > 65535)
@@ -260,11 +260,11 @@ public partial class Connection : ContentPage, IQueryAttributable
 				case "copy":
 					if (_publicLine.Length == 0) { return; }
 					await Clipboard.Default.SetTextAsync(_publicLine);
-					await BusyRunner.Show("This phone's key", i18n.Translate("Key copied. Add it to ~/.ssh/authorized_keys on the Mac."));
+					await BusyRunner.Show("This phone's key", i18n.Translate("Key copied. Add it to the machine's authorized SSH keys."));
 					break;
 				case "forget":
 					string forget = i18n.Translate("Forget host key");
-					if (await PopupsHandle.PopDisplayAsync(forget, i18n.Translate("Forget this Mac's host key? The next connection will ask you to trust it again."), [forget, i18n.Translate("Cancel")], Destructive: true) != forget) { return; }
+					if (await PopupsHandle.PopDisplayAsync(forget, i18n.Translate("Forget this machine's host key? The next connection will ask you to trust it again."), [forget, i18n.Translate("Cancel")], Destructive: true) != forget) { return; }
 					RemoteSettings.SavePin("");
 					HostKeyPrompt.Forget();
 					ShowState();

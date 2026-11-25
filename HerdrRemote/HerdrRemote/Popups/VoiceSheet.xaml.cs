@@ -65,6 +65,14 @@ public partial class VoiceSheet : ContentView
 	private int _load, _listen;
 	private long? _previewGeneration;
 	private bool _providers, _closed, _committed, _filtering, _own;
+	private bool _compact;
+	private bool _searching;
+#if IOS
+	private bool _searchKeyboard;
+	private IDisposable? _keyboardShowing, _keyboardHidden;
+#endif
+	private readonly VerticalStackLayout _overflow = new();
+	private readonly Thickness _headPadding, _searchMargin;
 	private string _language = "";
 
 	private VoiceSheet(Action<SetupDraft?> close, ITtsProvider? provider, SetupDraft? draft)
@@ -75,6 +83,21 @@ public partial class VoiceSheet : ContentView
 		_returnDraft = draft;
 		_own = draft?.Own ?? false;
 		InitializeComponent();
+		_headPadding = SheetHead.Padding;
+		_searchMargin = SearchRow.Margin;
+#if ANDROID
+		foreach (Entry entry in new[] { En_Search, En_Manual })
+		{
+			entry.HandlerChanged += (_, _) =>
+			{
+				if (entry.Handler?.PlatformView is Android.Widget.EditText edit)
+				{
+					edit.ViewAttachedToWindow += (_, _) => edit.ImeOptions |=
+						(Android.Views.InputMethods.ImeAction)Android.Views.InputMethods.ImeFlags.NoExtractUi;
+				}
+			};
+		}
+#endif
 #if IOS || ANDROID
 		// As with UnifiedEntry, the field border owns the decoration, not the native control.
 		foreach (Picker picker in new[] { Pk_Language, Pk_Sample })
@@ -203,6 +226,28 @@ public partial class VoiceSheet : ContentView
 		_window = Window;
 		if (_window is { } window) { window.Stopped += Window_Stopped; }
 		_session.Changed += Session_Changed;
+#if IOS
+		_keyboardShowing = UIKit.UIKeyboard.Notifications.ObserveWillShow((_, _) =>
+		{
+			if (_searching) { _searchKeyboard = true; }
+		});
+		_keyboardHidden = UIKit.UIKeyboard.Notifications.ObserveDidHide((_, _) =>
+		{
+			if (!_searchKeyboard) { return; }
+			_searchKeyboard = false;
+			Dispatcher.Dispatch(() =>
+			{
+				if (_closed || En_Search.IsFocused || !_searching) { return; }
+				SetSearching(false);
+				((IView)Body).InvalidateMeasure();
+				if (_host is { } host)
+				{
+					((IView)host).InvalidateMeasure();
+					host.Refit(_compact ? true : null);
+				}
+			});
+		});
+#endif
 		await LoadVoicesAsync();
 	}
 
@@ -222,6 +267,11 @@ public partial class VoiceSheet : ContentView
 	{
 		CloseWork();
 		Reading.Detach();
+#if IOS
+		_keyboardShowing?.Dispose();
+		_keyboardHidden?.Dispose();
+		_keyboardShowing = _keyboardHidden = null;
+#endif
 		if (_host is { } host) { host.Closing -= Host_Closing; }
 		_session.Changed -= Session_Changed;
 		if (_window is { } window) { window.Stopped -= Window_Stopped; }
@@ -233,6 +283,8 @@ public partial class VoiceSheet : ContentView
 	private void Sheet_SizeChanged(object? sender, EventArgs e)
 	{
 		if (_closed || Height <= 0) { return; }
+		UpdateCompactLayout();
+		if (_compact) { return; }
 		double chrome = Math.Max(0, SheetHead.Height)
 			+ (ReadingSlot.IsVisible && Reading.IsVisible ? Math.Max(0, Reading.Height) : 0)
 			+ (ProviderCard.IsVisible ? Math.Max(0, ProviderCard.Height) : 0)
@@ -242,6 +294,54 @@ public partial class VoiceSheet : ContentView
 		double room = Math.Max(48, Height - chrome - 64);
 		Notes.MaximumHeightRequest = Math.Max(48, room - Btn_Use.MinimumHeightRequest - FooterScroll.RowSpacing);
 	}
+
+	private void UpdateCompactLayout()
+	{
+		double limit = _host?.BodyHeightLimit ?? double.PositiveInfinity;
+		if (Width <= 0 || limit <= 0 || !double.IsFinite(limit)) { return; }
+		double HeightOf(View view) => view.IsVisible ? view.Measure(Width, double.PositiveInfinity).Height : 0;
+		// Make room for at least one result before nonessential content can take its space.
+		double wanted = Btn_Done.MinimumHeightRequest + _headPadding.VerticalThickness
+			+ (Reading.IsVisible ? HeightOf(ReadingSlot) : 0) + HeightOf(ProviderCard)
+			+ HeightOf(SearchRow) + (_compact && SearchRow.IsVisible ? _searchMargin.VerticalThickness : 0)
+			+ HeightOf(LanguageRow) + HeightOf(ManualRow) + ListHead.HeightRequest + 64
+			+ (FooterScroll.IsVisible ? Btn_Use.MinimumHeightRequest + FooterScroll.RowSpacing : 0);
+		bool compact = wanted > limit;
+#if IOS
+		// Search temporarily hides rows. Don't promote a short sheet until those rows are restored.
+		if (_searching && _compact) { return; }
+#endif
+		if (compact == _compact) { return; }
+		_compact = compact;
+		Lbl_Title.IsVisible = !compact;
+		SheetHead.Padding = compact ? new Thickness(0, 0, _headPadding.Right, 0) : _headPadding;
+		SearchRow.Margin = compact ? new Thickness(_searchMargin.Left, 0, _searchMargin.Right, 0) : _searchMargin;
+		Grid.SetRow(SheetHead, compact ? 3 : 0);
+		Grid.SetColumn(SheetHead, compact ? 1 : 0);
+		Grid.SetColumnSpan(SheetHead, compact ? 1 : 2);
+		Grid.SetColumnSpan(SearchRow, compact ? 1 : 2);
+		View[] bodyViews = [ReadingSlot, ProviderCard, LanguageRow, ManualRow, FooterScroll];
+		if (compact)
+		{
+			ListCard.Children.Remove(ListHead);
+			_overflow.Add(ListHead);
+			foreach (View view in bodyViews) { Body.Children.Remove(view); _overflow.Add(view); }
+			Notes.MaximumHeightRequest = double.PositiveInfinity;
+			Items.Footer = _overflow;
+		}
+		else
+		{
+			Items.Footer = null;
+			_overflow.Children.Clear();
+			ListCard.Add(ListHead);
+			foreach (View view in bodyViews) { Body.Add(view); }
+		}
+		UpdateListHeight();
+		_host?.Refit(compact || _searching);
+	}
+
+	private void UpdateListHeight() => Items.MaximumHeightRequest = _compact || _searching
+		? double.PositiveInfinity : Math.Min(Math.Max(1, _visible.Count), 5) * 64;
 
 	private async Task LoadVoicesAsync(bool refresh = false, bool more = false)
 	{
@@ -341,9 +441,8 @@ public partial class VoiceSheet : ContentView
 			}
 			if (!_closed && load == _load)
 			{
-				Element? host = Parent;
-				while (host is not null and not BottomSheet) { host = host.Parent; }
-				(host as BottomSheet)?.Refit(En_Search.IsFocused);
+				UpdateCompactLayout();
+				_host?.Refit(_compact || _searching);
 			}
 		}
 	}
@@ -364,7 +463,7 @@ public partial class VoiceSheet : ContentView
 			if (old >= 0) { _visible.Move(old, i); } else { _visible.Insert(i, wanted[i]); }
 		}
 		while (_visible.Count > wanted.Count) { _visible.RemoveAt(_visible.Count - 1); }
-		Items.MaximumHeightRequest = En_Search.IsFocused ? double.PositiveInfinity : Math.Min(Math.Max(1, wanted.Count), 5) * 64;
+		UpdateListHeight();
 		if (wanted.Count == 0) { Lbl_Note.Text = i18n.Translate("No matching voices."); }
 		else if (Lbl_Note.Text == i18n.Translate("No matching voices.")) { Lbl_Note.Text = _voices?.RefreshError ?? ""; }
 	}
@@ -505,7 +604,7 @@ public partial class VoiceSheet : ContentView
 		{
 			_visible.Add(new(new(provider.Id, provider.Name), TtsProviders.Glyph(provider.Id)) { IsInUse = provider == current });
 		}
-		Items.MaximumHeightRequest = 5 * 64;
+		UpdateListHeight();
 		SearchRow.IsVisible = LanguageRow.IsVisible = ManualRow.IsVisible = false;
 		SetUpRow.IsVisible = false;
 		Btn_More.IsVisible = Btn_Scope.IsVisible = Btn_Refresh.IsVisible = false;
@@ -525,12 +624,21 @@ public partial class VoiceSheet : ContentView
 	private void Search_FocusChanged(object? sender, FocusEventArgs e)
 	{
 		if (_closed) { return; }
-		ReadingSlot.IsVisible = ProviderCard.IsVisible = FooterScroll.IsVisible = !e.IsFocused;
+#if IOS
+		// UIKit clears focus before the keyboard gives the sheet its original viewport back.
+		if (!e.IsFocused && _searchKeyboard) { return; }
+#endif
+		SetSearching(e.IsFocused);
+	}
+
+	private void SetSearching(bool searching)
+	{
+		if (_searching == searching) { return; }
+		_searching = searching;
+		ReadingSlot.IsVisible = ProviderCard.IsVisible = FooterScroll.IsVisible = !searching;
 		ProjectRows();
 		Sheet_SizeChanged(this, EventArgs.Empty);
-		Element? host = Parent;
-		while (host is not null and not BottomSheet) { host = host.Parent; }
-		(host as BottomSheet)?.Refit(e.IsFocused);
+		_host?.Refit(_compact || searching);
 	}
 
 	private void Search_Changed(object? sender, TextChangedEventArgs e) => ProjectRows();

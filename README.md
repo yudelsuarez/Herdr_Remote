@@ -5,10 +5,10 @@
 **Your AI coding agents, in your pocket.** Remote Shell is a mobile app for iPhone and Android that puts your
 [herdr](https://herdr.dev) workspace on your phone: every agent, every pane, and their replies, all in one app.
 
-Start an agent on your Mac, walk away, and keep working from the phone: see who is working, who is done and who needs you,
+Start an agent on your machine, walk away, and keep working from the phone: see who is working, who is done and who needs you,
 read or listen to the answer, dictate the next prompt, and send it back.
 
-> **Status:** beta. The App Store and Google Play releases are on the way; until then you can build it from source.
+<p align="center"><a href="https://apps.apple.com/app/id6838730267">App Store</a> · <a href="https://play.google.com/store/apps/details?id=com.yudelsuarez.remoteshell">Google Play</a></p>
 
 <p align="center">
   <img src="docs/images/01-agents.png" width="180" alt="Every agent with its state">
@@ -45,17 +45,17 @@ read or listen to the answer, dictate the next prompt, and send it back.
 
 ## What you need
 
-- A Mac running [herdr](https://herdr.dev) (the app talks to `hc`, herdr's command line tool).
-- **Remote Login** turned on in the Mac's System Settings (Sharing), so the phone can reach it over SSH.
-- An iPhone or iPad with iOS 16 or later, or an Android phone with Android 13 or later, on the same network as the Mac
-  (or reachable through your VPN).
+- A machine running [herdr](https://herdr.dev) on macOS, Linux, or Windows (the app talks to `hc`, herdr's command line tool).
+- SSH enabled on the machine. The phone reaches it on your home network, or from anywhere through
+  [Tailscale](docs/getting-started.md#use-it-away-from-home) or another VPN, without opening any port on your router.
+- An iPhone or iPad with iOS 16 or later, or an Android phone with Android 13 or later.
 
 Step-by-step setup: [Getting started](docs/getting-started.md).
 
 ## Security and privacy
 
-Remote Shell connects **directly** from your phone to your Mac over SSH. There is no server in between, no account, and no
-analytics or tracking. The phone creates its own key, stored in the system's secure storage, and the Mac's identity is pinned.
+Remote Shell connects **directly** from your phone to your machine over SSH. There is no server in between, no account, and no
+analytics or tracking. The phone creates its own key, stored in the system's secure storage, and the machine's identity is pinned.
 Cloud voices and cloud dictation are optional and use your own API keys.
 
 The details, and what data goes where: [Security and privacy](docs/security-and-privacy.md). To report a vulnerability, see
@@ -95,14 +95,24 @@ If you publish your own build, also change the app identifier (`ApplicationId` i
 <summary><b>Does it work without herdr?</b></summary>
 
 No. Remote Shell is a companion for [herdr](https://herdr.dev): it shows and controls the workspaces, agents and terminals
-that herdr runs on your Mac.
+that herdr runs on your machine.
 </details>
 
 <details>
 <summary><b>Does my code go through any server?</b></summary>
 
-No. The phone connects straight to your Mac over SSH. Only the optional cloud voices and cloud dictation send anything
+No. The phone connects straight to your machine over SSH. Only the optional cloud voices and cloud dictation send anything
 elsewhere, and only to the provider you pick. See [Security and privacy](docs/security-and-privacy.md).
+</details>
+
+<details>
+<summary><b>Can I use it away from home? Do I have to open a port?</b></summary>
+
+Yes, you can, and no, you don't. Put the phone and the machine on the same private network with
+[Tailscale](https://tailscale.com) (free for personal use) or another VPN, and connect to the machine's Tailscale name or
+address. Nothing is opened on your router, it works even when your provider shares one public IP among many customers
+(CGNAT), and SSH is never exposed to the internet: only your own devices can reach it, and the traffic stays end-to-end
+encrypted even when it goes through a relay. Steps: [Use it away from home](docs/getting-started.md#use-it-away-from-home).
 </details>
 
 <details>

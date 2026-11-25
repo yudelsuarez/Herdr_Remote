@@ -15,6 +15,8 @@ public partial class BottomSheet : ContentView
 	public event EventHandler? Closed;
 	public event EventHandler? Closing;
 	public bool IsClosing => _closing;
+	internal double BodyHeightLimit => Panel.MaximumHeightRequest - Panel.Padding.VerticalThickness
+		- Grab.HeightRequest - Grab.Margin.VerticalThickness;
 	// Raised once the slide-up has finished (not for a sheet closed before it did): a field takes the keyboard then.
 	public event EventHandler? Shown;
 
@@ -34,6 +36,21 @@ public partial class BottomSheet : ContentView
 	{
 		if (Host.Height <= 0) { return; }
 		double band = Window is { Height: > 0 } window && Parent is View root ? Math.Max(0, window.Height - root.Frame.Bottom) : 0;
+#if ANDROID
+		// The page excludes the docked keyboard as well as system bars. Never extend the panel into the IME.
+		if (Parent is View { Handler.PlatformView: Android.Views.View native }
+			&& AndroidX.Core.View.ViewCompat.GetRootWindowInsets(native)?.IsVisible(AndroidX.Core.View.WindowInsetsCompat.Type.Ime()) == true)
+		{
+			band = 0;
+		}
+#elif IOS
+		// MAUI already sizes the host above the keyboard. Only the native bottom safe area is paintable.
+		if (Host.Handler?.PlatformView is UIKit.UIView { Window: { } nativeWindow }
+			&& band > (double)nativeWindow.SafeAreaInsets.Bottom + 1)
+		{
+			band = 0;
+		}
+#endif
 		Panel.Margin = new Thickness(0, 0, 0, -band);
 		// Keep the body's bottom clearance while the physical band changes.
 		Panel.Padding = new Thickness(_padding.Left, _padding.Top, _padding.Right, Panel.Padding.Bottom - _band + band);

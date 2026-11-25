@@ -155,15 +155,37 @@ internal sealed class HerdrAgents
 	internal static string? ProgramName(string? app) => Listed(app)?.Name;
 
 	// Select the icon program using herdr-app rules. Prefer the reported 7501 app: its table key, or its own name if unknown.
-	// Otherwise match the foreground process name exactly against table keys, aliases or Run[0]; use foreground.name, then argv[0]
-	// with its directory removed. Return null without a match. Both paths use one icon ID per program;
+	// Otherwise match the foreground program against table keys, aliases or Run[0]. Return null without a match.
+	// Both paths use one icon ID per program;
 	// a process-only match does not make the terminal an agent.
 	private static string? MarkOf(JsonObject record, string? app)
 	{
 		if (app is not null) { return Listed(app) is { Key: not "agent" } listed ? listed.Key : app; }
-		string? process = record["foreground"]?["name"]?.GetValue<string>() is { Length: > 0 } name ? name
-			: record["foreground"]?["argv"]?[0]?.GetValue<string>() is { Length: > 0 } argv0 ? Path.GetFileName(argv0) : null;
-		if (process is null) { return null; }
+		JsonNode? foreground = record["foreground"];
+		JsonArray? argv = foreground?["argv"] as JsonArray;
+		string? executable = argv is { Count: > 0 } ? argv[0]?.GetValue<string>() : null;
+		bool windows = (executable is not null && RemotePath.IsWindows(executable))
+			|| (foreground?["cwd"]?.GetValue<string>() is { } cwd && RemotePath.IsWindows(cwd));
+		string? process = foreground?["name"]?.GetValue<string>();
+		if (string.IsNullOrEmpty(process))
+		{
+			if (string.IsNullOrEmpty(executable)) { return null; }
+			process = windows ? RemotePath.Name(executable, true) : Path.GetFileName(executable);
+		}
+		if (windows)
+		{
+			// Windows reports the shell's direct child, which may be cmd running an installed shim.
+			if (process.Equals("cmd.exe", StringComparison.OrdinalIgnoreCase)
+				&& argv is [_, JsonValue flag, JsonValue target, ..]
+				&& flag.GetValue<string>().Equals("/c", StringComparison.OrdinalIgnoreCase)
+				&& target.GetValue<string>() is { } shim && RemotePath.IsWindows(shim)
+				&& shim.EndsWith(".cmd", StringComparison.OrdinalIgnoreCase))
+			{
+				process = RemotePath.Name(shim, true);
+			}
+			process = process.ToLowerInvariant();
+			if (process.EndsWith(".exe", StringComparison.Ordinal) || process.EndsWith(".cmd", StringComparison.Ordinal)) { process = process[..^4]; }
+		}
 		return Programs.FirstOrDefault(p => p.Key == process || p.Match.Contains(process, StringComparer.Ordinal) || (p.Run.Length > 0 && p.Run[0] == process)).Key;
 	}
 
@@ -870,7 +892,7 @@ internal sealed class HerdrAgents
 			string folder = space["folder"]?.GetValue<string>() ?? "";
 			string name = space["name"]?.GetValue<string>() is { Length: > 0 } named ? named
 				: ordered.Select(t => raw[t.Address].ShownSpace).FirstOrDefault(shown => shown.Length > 0) is { } shownSpace ? shownSpace
-				: Path.GetFileName(folder.TrimEnd('/')) is { Length: > 0 } folderName ? folderName
+				: RemotePath.Name(folder, RemotePath.IsWindows(folder)) is { Length: > 0 } folderName ? folderName
 				: ordered[0].Name;
 			arranged.Add(Named(new AgentSpace(spaceId, name, order, ordered, folder, tabs, false)));
 		}
@@ -881,7 +903,7 @@ internal sealed class HerdrAgents
 			List<AgentTab> tabs = Pending(Of(spaceId), 1);
 			List<AgentTerminal> ordered = [.. tabs.SelectMany(tab => tab.Terminals)];
 			string folder = FolderOf(ordered[0].Address) ?? "";
-			string name = Path.GetFileName(folder.TrimEnd('/')) is { Length: > 0 } folderName ? folderName : ordered[0].Name;
+			string name = RemotePath.Name(folder, RemotePath.IsWindows(folder)) is { Length: > 0 } folderName ? folderName : ordered[0].Name;
 			arranged.Add(Named(new AgentSpace(spaceId, name, next++, ordered, folder, tabs, true)));
 		}
 		List<AgentTerminal> machine = Of("");

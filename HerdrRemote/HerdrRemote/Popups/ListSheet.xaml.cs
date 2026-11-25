@@ -1,20 +1,18 @@
 using System.Diagnostics;
 using HerdrRemote;
+using HerdrRemote.Remote;
 using Languages;
 
 namespace Popups;
 
-// Select a new space's folder from folders in use or browse the Mac from home; return null on dismissal.
-// In Browse, tap to enter a folder, use ".." to go up, "Open here" to select, or Back to return to folders in use.
-// The list callback returns subfolders or null if listing fails. Provider mode filters rows and returns the selected key.
+// Select a folder in use, browse from home, or filter a provider list; return null on dismissal.
 public partial class ListSheet : ContentView
 {
 	internal const int MaxRows = 10;
 	private const int RowHeight = 46;
 	internal const int RowSubHeight = 58;
 
-	// Key identifies the folder or provider item; Trail is the trailing glyph. GlyphTurn rotates Glyph
-	// in degrees, so the dimmed ".." row turns the down arrow 180 degrees to point up.
+	// Key identifies the folder or provider item.
 	public sealed record Item(string Key, string Text, string Subtitle, string Glyph, double GlyphTurn, string Trail, bool Dim, int Height)
 	{
 		public bool HasSubtitle => Subtitle.Length > 0;
@@ -26,6 +24,7 @@ public partial class ListSheet : ContentView
 
 	private readonly Action<string?> _close;
 	private readonly string _home = "";
+	private readonly bool _windows;
 	private readonly IReadOnlyList<string> _folders = [];
 	private readonly Func<string, Task<List<string>?>>? _list;
 	// Browse uses _dir (empty in Folders mode); _load invalidates responses from earlier loads.
@@ -39,10 +38,11 @@ public partial class ListSheet : ContentView
 	private BottomSheet? _host;
 	private bool _closed, _hostShown, _focusPending;
 
-	internal ListSheet(string home, IReadOnlyList<string> folders, Func<string, Task<List<string>?>> list, Action<string?> close)
+	private ListSheet(string home, IReadOnlyList<string> folders, Func<string, Task<List<string>?>> list, Action<string?> close)
 	{
 		_close = result => { if (_closed) { return; } CloseWork(); close(result); };
 		_home = home;
+		_windows = RemotePath.IsWindows(home);
 		_folders = folders;
 		_list = list;
 		InitializeComponent();
@@ -157,18 +157,10 @@ public partial class ListSheet : ContentView
 	}
 
 	// A path with home as "~".
-	internal static string Tilde(string path, string home) =>
-		path == home ? "~" : path.StartsWith(home + "/", StringComparison.Ordinal) ? "~" + path[home.Length..] : path;
+	private static string Tilde(string path, string home) =>
+		RemotePath.Tilde(path, home, RemotePath.IsWindows(home));
 
-	private static string Name(string path) => path == "/" ? "/" : Path.GetFileName(path.TrimEnd('/'));
-
-	private static string UpOf(string path)
-	{
-		int cut = path.TrimEnd('/').LastIndexOf('/');
-		return cut <= 0 ? "/" : path[..cut];
-	}
-
-	private static string Join(string folder, string name) => folder == "/" ? "/" + name : folder + "/" + name;
+	private string Name(string path) => path == "/" ? "/" : RemotePath.Name(path, _windows);
 
 	private void ShowFolders()
 	{
@@ -183,7 +175,7 @@ public partial class ListSheet : ContentView
 		Lbl_Section.IsVisible = _folders.Count > 0;
 		Divider.IsVisible = _folders.Count > 0;
 		BrowseRow.IsVisible = true;
-		SetItems([.. _folders.Select(folder => new Item(folder, Name(folder), Tilde(folder, _home), "\uE928", 0, "", false, RowSubHeight))]);
+		SetItems([.. _folders.Select(folder => new Item(folder, RemotePath.Name(folder, RemotePath.IsWindows(folder)) is { Length: > 0 } name ? name : folder, Tilde(folder, _home), "\uE928", 0, "", false, RowSubHeight))]);
 	}
 
 	private async void Browse(string dir)
@@ -200,7 +192,7 @@ public partial class ListSheet : ContentView
 		Lbl_Path.FormattedText = Crumb(dir);
 		Lbl_Path.IsVisible = true;
 		ShowNote("Loading");
-		List<Item> up = dir == "/" ? [] : [new Item(UpOf(dir), Name(UpOf(dir)), "", "\uE909", 180, "", true, RowHeight)];
+		List<Item> up = RemotePath.Parent(dir, _windows) is { } parent ? [new Item(parent, Name(parent), "", "\uE909", 180, "", true, RowHeight)] : [];
 		SetItems(up);
 		List<string>? names;
 		try
@@ -220,15 +212,14 @@ public partial class ListSheet : ContentView
 		}
 		ShowNote(names.Count == 0 ? "No folders inside." : null);
 		Btn_Open.IsEnabled = true;
-		SetItems([.. up, .. names.Select(name => new Item(Join(dir, name), name, "", "\uE928", 0, "\uE907", false, RowHeight))]);
+		SetItems([.. up, .. names.Select(name => new Item(RemotePath.Join(dir, name, _windows), name, "", "\uE928", 0, "\uE907", false, RowHeight))]);
 	}
 
 	// Show breadcrumb segments, such as "~ / Projects / app", with the last segment in the ink color.
 	private FormattedString Crumb(string dir)
 	{
 		string shown = Tilde(dir, _home);
-		List<string> parts = shown == "/" ? ["/"] : [.. shown.Split('/', StringSplitOptions.RemoveEmptyEntries)];
-		if (shown.StartsWith('/') && shown != "/") { parts.Insert(0, "/"); }
+		List<string> parts = RemotePath.CrumbParts(shown, _windows);
 		FormattedString crumb = new();
 		for (int i = 0; i < parts.Count; i++)
 		{

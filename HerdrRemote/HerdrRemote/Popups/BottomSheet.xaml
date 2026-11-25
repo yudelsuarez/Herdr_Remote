@@ -9,7 +9,7 @@
         </Grid>
         <Border x:Name="Panel" Style="{StaticResource Sht}" Opacity="0" SizeChanged="Panel_SizeChanged">
             <Grid RowDefinitions="Auto,*">
-                <Border Style="{StaticResource Sht.Grab}"/>
+                <Border x:Name="Grab" Style="{StaticResource Sht.Grab}"/>
                 <ContentView x:Name="Slot" Grid.Row="1"/>
             </Grid>
         </Border>

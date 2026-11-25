@@ -153,7 +153,7 @@ public class MainActivity : MauiAppCompatActivity
 		try
 		{
 			string? answer = await PopupsHandle.PopDisplayAsync(Languages.i18n.Translate("Background connection"),
-				Languages.i18n.Translate("Without the battery permission, Android cuts the connection to your Mac about 5 seconds after the app goes to the background. It reconnects when you come back."),
+				Languages.i18n.Translate("Without the battery permission, Android cuts the connection to your machine about 5 seconds after the app goes to the background. It reconnects when you come back."),
 				[give, Languages.i18n.Translate("Leave it")], Destructive: false, Handle: dismiss => _dismissNotice = dismiss,
 				Shown: () =>
 				{

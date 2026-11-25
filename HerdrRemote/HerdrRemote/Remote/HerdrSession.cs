@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net.Sockets;
 using HerdrRemote.Services;
+using Languages;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 
@@ -35,7 +36,7 @@ internal enum SessionState
 // If the core channel drops while SSH remains connected, reopen it and reattach the terminal; programs keep running in the core.
 // An SSH error, failed core-channel recovery or watchdog timeout starts a full reconnect using RetryDelays.
 // SSH.NET keepalive stays disabled. Core event heartbeats arrive every 15 s; WatchdogSilence without a frame counts as a drop.
-// Password sign-in is also used once to add the phone's public key to the Mac's authorized_keys.
+// Password sign-in is also used once to add the phone's public key to the SSH server's authorized_keys.
 internal sealed class HerdrSession
 {
 	private static readonly TimeSpan ConnectTimeout = TimeSpan.FromSeconds(10);
@@ -85,6 +86,7 @@ internal sealed class HerdrSession
 
 	// Core API access; null while disconnected from the core.
 	public CoreApi? Api { get; private set; }
+	internal HerdrCreate? Creation { get; private set; }
 
 	// The terminals and their agents, kept current by the core's events.
 	public HerdrAgents Agents { get; } = new();
@@ -142,6 +144,9 @@ internal sealed class HerdrSession
 			client.HostKeyReceived += OnHostKeyReceived;
 			client.ErrorOccurred += OnErrorOccurred;
 			await client.ConnectAsync(ct);
+			SshShell shell = await SshRemoteCommands.ProbeAsync(client, ct);
+			if (_client != client) { return; }
+			bool isWindows = shell != SshShell.Posix;
 			if (password is not null)
 			{
 				// After password sign-in, append the phone's public key without duplicates, separating any unterminated last line.
@@ -149,8 +154,14 @@ internal sealed class HerdrSession
 				string line = await SshKeyStore.PublicLineAsync();
 				using CancellationTokenSource deadline = CancellationTokenSource.CreateLinkedTokenSource(ct);
 				deadline.CancelAfter(RequestTimeout);
-				using SshCommand add = client.CreateCommand($"""set -e; umask 077; d="$HOME/.ssh"; f="$d/authorized_keys"; mkdir -p "$d"; chmod 700 "$d"; touch "$f"; chmod 600 "$f"; if ! grep -qF -- {Quote(line.Split(' ')[1])} "$f"; then if [ -s "$f" ] && [ -n "$(tail -c 1 "$f")" ]; then printf '\n' >> "$f"; fi; printf '%s\n' {Quote(line)} >> "$f"; fi""");
-				await add.ExecuteAsync(deadline.Token);
+				using SshCommand add = client.CreateCommand(SshRemoteCommands.Enroll(isWindows, line));
+				Task run = add.ExecuteAsync(deadline.Token);
+				if (isWindows)
+				{
+					await using Stream input = add.CreateInputStream();
+					await input.WriteAsync(System.Text.Encoding.UTF8.GetBytes(line), deadline.Token);
+				}
+				await run;
 				if (_client != client) { return; }
 				if (add.ExitStatus == 0)
 				{
@@ -160,7 +171,7 @@ internal sealed class HerdrSession
 				SetState(SessionState.Failed, add.Error);
 				return;
 			}
-			await OpenCoreAsync(client, ct);
+			await OpenCoreAsync(client, shell, ct);
 		}
 		catch (OperationCanceledException) when (ct.IsCancellationRequested)
 		{
@@ -177,12 +188,12 @@ internal sealed class HerdrSession
 
 	// Open `hc connect`, then subscribe to agents and reattach the terminal.
 	// Reopen a dropped core channel while its SSH client is still current; programs survive a core restart or update.
-	private async Task OpenCoreAsync(SshClient client, CancellationToken ct)
+	private async Task OpenCoreAsync(SshClient client, SshShell shell, CancellationToken ct)
 	{
 		CoreConnection core;
 		try
 		{
-			core = await CoreConnection.OpenAsync(client, ct);
+			core = await CoreConnection.OpenAsync(client, shell, ct);
 		}
 		catch (OperationCanceledException) when (ct.IsCancellationRequested)
 		{
@@ -206,6 +217,7 @@ internal sealed class HerdrSession
 		// Watch channel completion independently: connecting returns before the channel ends.
 		// Dispose the dropped exec channel before reopening. Failed recovery must not leave the session Connected without a core.
 		CancellationToken lifetime = _lifetime.Token;
+		Creation = new HerdrCreate(api, Agents, shell != SshShell.Posix);
 		_ = Task.Run(async () =>
 		{
 			await core.Lost;
@@ -217,12 +229,13 @@ internal sealed class HerdrSession
 				Terminal?.Close();
 				Agents.Stop();
 				Api = null;
+				Creation = null;
 				_core = null;
 				await core.DisposeAsync();
 				SetState(SessionState.Reconnecting, null);
 				try
 				{
-					await OpenCoreAsync(client, lifetime);
+					await OpenCoreAsync(client, shell, lifetime);
 				}
 				catch (Exception ex)
 				{
@@ -255,50 +268,6 @@ internal sealed class HerdrSession
 			}
 			Terminal?.Reopen();
 		});
-	}
-
-	// Upload an image, photo or file over a separate SSH exec channel and return its path for the agent.
-	// Each upload uses $TMPDIR/remoteshell/<yyyyMMdd-HHmmss>-<6 hex>/<name> to preserve its filename without collisions.
-	// Names retain letters, digits, ".", "_" and "-"; other runs become "-", so the returned path needs no shell quoting.
-	// Before creating the directory, remove files older than a day, then empty directories older than a day.
-	// This avoids deleting a newly created upload directory. Agents are expected to read uploads soon after receiving them.
-	// RequestTimeout measures lack of progress and resets after each block, so large uploads are not cut off.
-	public async Task<string> UploadAsync(Stream data, string name, CancellationToken ct)
-	{
-		if (_client is not { IsConnected: true } client) { throw new InvalidOperationException("The SSH session is not connected."); }
-		string folder = $"{DateTime.Now.ToString("yyyyMMdd-HHmmss", System.Globalization.CultureInfo.InvariantCulture)}-{Guid.NewGuid().ToString("N")[..6]}";
-		using CancellationTokenSource deadline = CancellationTokenSource.CreateLinkedTokenSource(ct);
-		deadline.CancelAfter(RequestTimeout);
-		using SshCommand command = client.CreateCommand($$"""d="${TMPDIR:-/tmp}"; d="${d%/}/remoteshell"; mkdir -p "$d" && find "$d" -type f -mmin +1440 -delete; find "$d" -mindepth 1 -type d -empty -mmin +1440 -delete; u="$d/{{folder}}"; mkdir "$u" && f="$u/{{SafeFileName(name)}}" && cat > "$f" && printf '%s' "$f" """);
-		Task run = command.ExecuteAsync(deadline.Token);
-		// Closing stdin ends cat's input, and the command answers with the path.
-		await using (Stream input = command.CreateInputStream())
-		{
-			byte[] block = new byte[81920];
-			int read;
-			while ((read = await data.ReadAsync(block, deadline.Token)) > 0)
-			{
-				await input.WriteAsync(block.AsMemory(0, read), deadline.Token);
-				deadline.CancelAfter(RequestTimeout);
-			}
-		}
-		await run;
-		if (command.ExitStatus != 0) { throw new IOException(command.Error.Trim()); }
-		return command.Result.Trim();
-	}
-
-	// Make a filename safe for unquoted use by the Mac's shell and agents. After NFC normalization, retain letters, digits,
-	// ".", "_" and "-"; replace other runs with one "-". Empty names and dot-only names (including "." and "..") become "file".
-	internal static string SafeFileName(string name)
-	{
-		System.Text.StringBuilder safe = new();
-		foreach (char c in name.Normalize(System.Text.NormalizationForm.FormC))
-		{
-			if (char.IsLetterOrDigit(c) || c is '.' or '_' or '-') { safe.Append(c); }
-			else if (safe.Length == 0 || safe[^1] != '-') { safe.Append('-'); }
-		}
-		string result = safe.ToString();
-		return result.Trim('.').Length == 0 ? "file" : result;
 	}
 
 	// On Window.Stopped, keep the connection while the OS allows background work, up to BackgroundLimit.
@@ -468,6 +437,7 @@ internal sealed class HerdrSession
 		Terminal?.Close();
 		Agents.Stop();
 		Api = null;
+		Creation = null;
 		if (_core is { } core)
 		{
 			_core = null;
@@ -484,7 +454,7 @@ internal sealed class HerdrSession
 	}
 
 	// POSIX single-quote escaping for every value put into a remote command line: close the quote, an escaped quote, reopen.
-	internal static string Quote(string value) => "'" + value.Replace("'", "'\\''") + "'";
+	internal static string Quote(string value) => SshRemoteCommands.Quote(value);
 
 	// SSH.NET calls this synchronously on its own thread. Reject unknown or changed keys; the page requests trust and reconnects.
 	private void OnHostKeyReceived(object? sender, HostKeyEventArgs e)
@@ -513,7 +483,9 @@ internal sealed class HerdrSession
 			_ => SessionState.Failed,
 		};
 		Debug.WriteLine($"[Herdr] {state}: {ex.GetType().Name}: {ex.Message}");
-		SetState(state, ex.Message, client: client);
+		string detail = ex is InvalidDataException { Message: SshRemoteCommands.ProbeFailure }
+			? i18n.Translate(SshRemoteCommands.ProbeFailure) : ex.Message;
+		SetState(state, detail, client: client);
 	}
 
 	// SSH.NET events and read completions run on its threads; publish state and StateChanged on the UI thread.

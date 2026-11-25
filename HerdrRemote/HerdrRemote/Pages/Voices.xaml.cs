@@ -83,7 +83,7 @@ public partial class Voices : ContentPage
 	private void ShowConnection()
 	{
 		string sub = RemoteSettings.IsConfigured ? $"{RemoteSettings.User}@{RemoteSettings.Host}" : "";
-		ConnectionRow.SetItems([new("\uE930", i18n.Translate("Mac"), ConnectionCard.StateWord(App.Herdr.State, RemoteSettings.IsConfigured), false, sub, Chevron: true, Key: "connection", ValueTone: ConnectionCard.Tone(App.Herdr.State, RemoteSettings.IsConfigured) switch
+		ConnectionRow.SetItems([new("\uE930", i18n.Translate("Machine"), ConnectionCard.StateWord(App.Herdr.State, RemoteSettings.IsConfigured), false, sub, Chevron: true, Key: "connection", ValueTone: ConnectionCard.Tone(App.Herdr.State, RemoteSettings.IsConfigured) switch
 		{
 			HeaderTone.Ok => ValueTone.Ok,
 			HeaderTone.Warn => ValueTone.Work,

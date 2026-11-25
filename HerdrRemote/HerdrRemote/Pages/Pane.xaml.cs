@@ -123,6 +123,7 @@ public partial class Pane : ContentPage, IQueryAttributable
 		};
 		_sideList.Searched += () => _ = App.GoToAsync("SearchAll");
 		_sideList.Asked += ask => _ = HerdrRemote.Pages.Arrange.AskAsync(ArrangeHere(), ask);
+		TerminalLayer.SizeChanged += (_, _) => Draft.FitActions(TerminalLayer.Width, TerminalLayer.Height);
 		Screen.Ready += OpenStream;
 		Screen.Unusable += Screen_Unusable;
 		// The phone's grid is the terminal's.
@@ -829,16 +830,29 @@ public partial class Pane : ContentPage, IQueryAttributable
 		Root.Add(viewer);
 	}
 
-	// An image for the agent: written to a file on the Mac, and its path typed into the terminal as a paste (agents such as Claude
-	// Code take a pasted image path as the image).
+	// Herdr stages the image beside the selected terminal. Paste the returned path without submitting it.
 	private async Task SendImageAsync(byte[] data, string extension, Func<bool>? canSend = null)
 	{
 		LeaseOrigin origin = Origin;
 		if (!Current(origin) || canSend?.Invoke() == false) { return; }
 		CancellationToken ct = _work.Token;
 		using MemoryStream stream = new(data, false);
-		string path = await App.Herdr.UploadAsync(stream, $"image.{extension}", ct);
-		if (Current(origin) && canSend?.Invoke() != false) { Send(TerminalInput.Text(path, true, Screen.Modes)); }
+		string? path = await StageAttachmentAsync(origin, stream, $"image.{extension}", ct);
+		if (path is not null && Current(origin) && canSend?.Invoke() != false) { Send(TerminalInput.Attachment(path, Screen.Modes)); }
+	}
+
+	private async Task<string?> StageAttachmentAsync(LeaseOrigin origin, Stream source, string name, CancellationToken ct)
+	{
+		try
+		{
+			CoreApi api = App.Herdr.Api ?? throw new CoreLostException("terminal.put");
+			return await api.PutAsync(origin.Address, source, name, ct);
+		}
+		catch (InvalidDataException ex) when (ex.Message is CoreApi.AttachmentTooLarge or CoreApi.AttachmentsUnavailable)
+		{
+			if (Current(origin)) { await ShowMessageAsync(origin, "Attach", i18n.Translate(ex.Message)); }
+			return null;
+		}
 	}
 
 	// Route all program input here; user input first reclaims the phone's terminal size through ClaimSize.
@@ -1307,7 +1321,7 @@ public partial class Pane : ContentPage, IQueryAttributable
 	}
 
 	// Attach stops an active read; otherwise offer Photos, Camera when available, and Files.
-	// Use the system picker, stream the file to the Mac through UploadAsync, then type its path.
+	// Use the system picker, stage the file through Herdr, then paste its path.
 	// Permission refusal shows one shared message on both platforms; cancelling the picker does nothing.
 	private async void Bar_AttachTapped()
 	{
@@ -1354,11 +1368,11 @@ public partial class Pane : ContentPage, IQueryAttributable
 			{
 				if (down) { await ConnectedAsync(ct); }
 				if (!Current(origin)) { return; }
-				string path = await App.Herdr.UploadAsync(stream, file.FileName, ct);
-				if (!Current(origin)) { return; }
+				string? path = await StageAttachmentAsync(origin, stream, file.FileName, ct);
+				if (path is null || !Current(origin)) { return; }
 				if (down) { await painted.Task.WaitAsync(AttachWait, ct); }
 				if (!Current(origin)) { return; }
-				Send(TerminalInput.Text(path, true, Screen.Modes));
+				Send(TerminalInput.Attachment(path, Screen.Modes));
 			}
 			finally
 			{

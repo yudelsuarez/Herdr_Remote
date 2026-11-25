@@ -1,6 +1,6 @@
 /* The sentence iOS quotes inside the local network alert. A localized value overrides the one in Info.plist. */
 
-"NSLocalNetworkUsageDescription" = "Remote Shell connects to herdr on your Mac over your Wi-Fi. Without this, the app cannot show your spaces.";
+"NSLocalNetworkUsageDescription" = "Remote Shell connects to herdr on your machine over your Wi-Fi. Without this, the app cannot show your spaces.";
 "NSPhotoLibraryAddUsageDescription" = "Remote Shell saves the images your agents show to your photos when you tap Save to photos.";
 "NSCameraUsageDescription" = "Remote Shell uses the camera when you tap Camera to send a photo to your agent.";
 "NSMicrophoneUsageDescription" = "Remote Shell listens only while you dictate a message for your agent.";

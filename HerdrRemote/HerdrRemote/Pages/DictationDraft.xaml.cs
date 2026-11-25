@@ -9,10 +9,12 @@ public partial class DictationDraft : ContentView
 	private const int LiveTail = 280;
 	private bool _setting;
 	private DictationState _state = DictationState.Closed;
+	private readonly Thickness _cardPadding;
 
 	public DictationDraft()
 	{
 		InitializeComponent();
+		_cardPadding = Card.Padding;
 		ApplyLanguage();
 #if ANDROID
 		// No full-screen landscape editor (it would cover the terminal), as the Find field.
@@ -24,6 +26,18 @@ public partial class DictationDraft : ContentView
 			}
 		};
 #endif
+	}
+
+	internal void FitActions(double viewportWidth, double viewportHeight)
+	{
+		if (viewportWidth <= 0 || viewportHeight <= 0) { return; }
+		// At the end of the scroll, trailing whitespace must not take room from the action row.
+		double actionHeight = Actions.Measure(Math.Max(0, viewportWidth - _cardPadding.HorizontalThickness), double.PositiveInfinity).Height;
+		double bottom = Math.Clamp(viewportHeight - actionHeight, 0, _cardPadding.Bottom);
+		if (Card.Padding.Bottom != bottom)
+		{
+			Card.Padding = new Thickness(_cardPadding.Left, _cardPadding.Top, _cardPadding.Right, bottom);
+		}
 	}
 
 	// Send the draft (the paste), then Enter when asked; while listening, listening stops first.

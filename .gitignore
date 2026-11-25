@@ -25,3 +25,6 @@ node_modules/
 /AGENTS.md
 /HerdrRemote/Art/
 *.local.props
+
+# Local only: signed store packages and their symbols, built by the scripts in Distribution/
+/Distribution

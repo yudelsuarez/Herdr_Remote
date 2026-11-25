@@ -35,10 +35,6 @@ internal sealed class CoreConnection : IAsyncDisposable
 	internal static readonly TimeSpan CallTimeout = TimeSpan.FromSeconds(15);
 	private const int MaxAbandoned = 32;
 
-	// Find hc for non-interactive SSH sessions, whose PATH may omit ~/.local/bin. Try standard installation locations in order.
-	// Exit 127 means hc was not found.
-	internal const string RemoteLine = """for c in "$(command -v hc)" "$HOME/.local/bin/hc" /opt/homebrew/bin/hc /usr/local/bin/hc; do case "$c" in /*) [ -x "$c" ] && exec "$c" connect;; esac; done; echo "hc not found" >&2; exit 127""";
-
 	// Required methods, checked against the core's hello response.
 	private static readonly string[] Needed = ["terminal.read", "terminal.label", "terminal.attach", "events.subscribe", "doc.get", "terminal.run", "terminal.kill", "terminal.get", "doc.set", "machine.exec"];
 
@@ -82,9 +78,9 @@ internal sealed class CoreConnection : IAsyncDisposable
 	public Task Lost => _lost.Task;
 
 	// Open one additional SSH exec channel for `hc connect`, without a PTY, to carry all core traffic.
-	public static async Task<CoreConnection> OpenAsync(SshClient client, CancellationToken ct)
+	public static async Task<CoreConnection> OpenAsync(SshClient client, SshShell shell, CancellationToken ct)
 	{
-		SshCommand command = client.CreateCommand(RemoteLine);
+		SshCommand command = client.CreateCommand(SshRemoteCommands.CoreConnect(shell));
 		Task run = command.ExecuteAsync(CancellationToken.None);
 		CoreConnection connection = new(command.CreateInputStream(), command.OutputStream, command);
 		try
@@ -141,12 +137,14 @@ internal sealed class CoreConnection : IAsyncDisposable
 
 	// Concurrent JSON-RPC calls on channel 0. Throws CoreRpcException with the core's kind and hint,
 	// CoreLostException on connection loss, or TimeoutException after the deadline.
-	public async Task<JsonNode?> CallAsync(string method, JsonObject? parameters, CancellationToken ct, TimeSpan? timeout = null) =>
-		(await CallAsync(method, parameters, false, timeout ?? CallTimeout, ct).ConfigureAwait(false)).Result;
+	public async Task<JsonNode?> CallAsync(string method, JsonObject? parameters, CancellationToken ct, TimeSpan? timeout = null,
+		JsonSerializerOptions? json = null) =>
+		(await CallAsync(method, parameters, false, timeout ?? CallTimeout, ct, json).ConfigureAwait(false)).Result;
 
 	// Stream-opening RPC (terminal.attach or events.subscribe). The reply precedes the stream's first frame.
 	// Register the stream while reading that reply so no subsequent frame is unrouted.
-	internal async Task<Reply> CallAsync(string method, JsonObject? parameters, bool opensStream, TimeSpan timeout, CancellationToken ct)
+	internal async Task<Reply> CallAsync(string method, JsonObject? parameters, bool opensStream, TimeSpan timeout, CancellationToken ct,
+		JsonSerializerOptions? json = null)
 	{
 		long id = Interlocked.Increment(ref _lastId);
 		Waiter waiter = new(method, new TaskCompletionSource<Reply>(TaskCreationOptions.RunContinuationsAsynchronously), opensStream);
@@ -156,7 +154,7 @@ internal sealed class CoreConnection : IAsyncDisposable
 			_waiting[id] = waiter;
 		}
 		JsonObject request = new() { ["jsonrpc"] = "2.0", ["id"] = id, ["method"] = method, ["params"] = parameters ?? [] };
-		Send(0, CoreFrameKind.Data, Encoding.UTF8.GetBytes(request.ToJsonString()));
+		Send(0, CoreFrameKind.Data, Encoding.UTF8.GetBytes(request.ToJsonString(json)));
 		// Log only the method name, never terminal output or user input.
 		Debug.WriteLine($"[Core] {method}");
 		using CancellationTokenSource deadline = CancellationTokenSource.CreateLinkedTokenSource(ct);
@@ -427,7 +425,7 @@ internal sealed class CoreLostException(string method) : Exception($"{method}: l
 // The core has an incompatible protocol generation or lacks a required method.
 internal sealed class CoreMismatchException(string message) : Exception(message);
 
-// `hc connect` could not start. NotInstalled means hc was absent from all locations tried by RemoteLine.
+// `hc connect` could not start. NotInstalled means hc was absent from all locations tried.
 internal sealed class CoreConnectException(string message, bool notInstalled, Exception inner) : Exception(message, inner)
 {
 	public bool NotInstalled { get; } = notInstalled;

@@ -35,6 +35,7 @@ public sealed class ImageViewer : ContentView
 	private readonly MarkupCanvas _markup;
 	private readonly Grid _viewHeader, _editHeader;
 	private readonly HorizontalStackLayout _actions, _colors;
+	private readonly ScrollView _palette;
 	private readonly Button _cancel, _undo, _redo, _done;
 	private readonly Grid _progress;
 	private readonly Spinner _spinner;
@@ -243,8 +244,11 @@ public sealed class ImageViewer : ContentView
 		_editHeader.Add(_cancel);
 		_editHeader.Add(new HorizontalStackLayout { Style = App.Res<Style>("Row.Gap6"), VerticalOptions = LayoutOptions.Center, Children = { _undo, _redo } }, 2);
 		_editHeader.Add(new Grid { VerticalOptions = LayoutOptions.Center, Children = { _done, _progress } }, 4);
+#if IOS
+		if (OperatingSystem.IsIOSVersionAtLeast(26)) { BindWindowControlMargins(_editHeader); }
+#endif
 		_colors = new HorizontalStackLayout { Style = App.Res<Style>("Row.Gap8"), HorizontalOptions = LayoutOptions.Center,
-			Margin = new Thickness(0, 10, 0, 16), IsVisible = false };
+			Margin = new Thickness(0, 10, 0, 16) };
 		foreach (string hex in new[] { "#E5484D", "#F5C451", "#4CC38A", "#91B6EE", "#EEEEEF" })
 		{
 			Color ink = Color.FromArgb(hex);
@@ -262,13 +266,69 @@ public sealed class ImageViewer : ContentView
 		Button tool = new() { Style = App.Res<Style>("TrayKey.IconAcc"), Text = "\xE95D", InputTransparent = true };
 		SemanticProperties.SetDescription(tool, i18n.Translate("Markup"));
 		_colors.Add(tool);
+		_palette = new ScrollView { Content = _colors, Orientation = ScrollOrientation.Horizontal,
+			HorizontalOptions = LayoutOptions.Center, HorizontalScrollBarVisibility = ScrollBarVisibility.Never, IsVisible = false };
 		Content = new Grid { RowDefinitions = [new(GridLength.Auto), new(GridLength.Star), new(GridLength.Auto)],
-			Children = { _viewHeader, _editHeader, _canvas, _actions, _colors } };
+			Children = { _viewHeader, _editHeader, _canvas, _actions, _palette } };
 		Grid.SetRow(_canvas, 1);
 		Grid.SetRow(_actions, 2);
-		Grid.SetRow(_colors, 2);
+		Grid.SetRow(_palette, 2);
 		UpdateMarkup();
 	}
+
+#if IOS
+	[System.Runtime.Versioning.SupportedOSPlatform("ios26.0")]
+	private static void BindWindowControlMargins(Grid header)
+	{
+		Thickness padding = header.Padding;
+		header.HandlerChanged += (_, _) =>
+		{
+			if (header.Handler?.PlatformView is not UIKit.UIView native) { return; }
+			using UIKit.UIViewLayoutRegion region = UIKit.UIViewLayoutRegion.CreateMarginsLayoutRegion(
+				UIKit.UIViewLayoutRegionAdaptivityAxis.Horizontal);
+			UIKit.UILayoutGuide guide = native.GetLayoutGuide(region);
+			// Follow UIKit's guide on live window and control changes, not just when the managed width changes.
+			// One probe per native header. The probe reaches its container through Superview and the header through a weak
+			// reference, so it holds nothing that keeps the closed viewer's views alive.
+			foreach (UIKit.UIView old in native.Subviews.OfType<WindowControlMargins>().ToArray()) { old.RemoveFromSuperview(); }
+			WeakReference<Grid> owner = new(header);
+			WindowControlMargins probe = new((frame, container) =>
+			{
+				if (frame.Width <= 0 || !owner.TryGetTarget(out Grid? header)) { return; }
+				double left = Math.Max(padding.Left, (double)frame.Left);
+				double right = Math.Max(padding.Right, (double)(container.Bounds.Width - frame.Right));
+				Thickness next = new(left, padding.Top, right, padding.Bottom);
+				if (header.Padding != next) { header.Padding = next; }
+			});
+			native.AddSubview(probe);
+			UIKit.NSLayoutConstraint.ActivateConstraints([
+				probe.LeftAnchor.ConstraintEqualTo(guide.LeftAnchor),
+				probe.RightAnchor.ConstraintEqualTo(guide.RightAnchor),
+				probe.TopAnchor.ConstraintEqualTo(native.TopAnchor),
+				probe.HeightAnchor.ConstraintEqualTo(1)
+			]);
+		};
+	}
+
+	private sealed class WindowControlMargins : UIKit.UIView
+	{
+		private readonly Action<CoreGraphics.CGRect, UIKit.UIView> _changed;
+
+		public WindowControlMargins(Action<CoreGraphics.CGRect, UIKit.UIView> changed)
+		{
+			_changed = changed;
+			TranslatesAutoresizingMaskIntoConstraints = false;
+			UserInteractionEnabled = false;
+			AccessibilityElementsHidden = true;
+		}
+
+		public override void LayoutSubviews()
+		{
+			base.LayoutSubviews();
+			if (Superview is { } container) { _changed(Frame, container); }
+		}
+	}
+#endif
 
 	private void UpdateMarkup()
 	{
@@ -297,7 +357,7 @@ public sealed class ImageViewer : ContentView
 		if (_nativePinch is not null) { _nativePinch.Enabled = !_editing; }
 #endif
 		_viewHeader.IsVisible = _actions.IsVisible = !_editing;
-		_editHeader.IsVisible = _colors.IsVisible = _markup.IsVisible = _editing;
+		_editHeader.IsVisible = _palette.IsVisible = _markup.IsVisible = _editing;
 		_markup.IsEnabled = _cancel.IsEnabled = _colors.IsEnabled = !_exporting;
 		_colors.Opacity = _exporting ? 0.35 : 1;
 		_undo.IsEnabled = !_exporting && _markup.CanUndo;
